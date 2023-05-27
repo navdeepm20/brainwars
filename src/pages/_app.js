@@ -3,6 +3,8 @@ import { ThemeProvider } from "@mui/material";
 import { darkTheme } from "../utils/theme";
 import createEmotionCache from "../utils/createEmotionCache";
 import { CacheProvider } from "@emotion/react";
+import { Inter } from "next/font/google";
+const inter = Inter({ subsets: ["latin"] });
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -14,7 +16,9 @@ export default function App({
   return (
     <CacheProvider value={emotionCache}>
       <ThemeProvider theme={darkTheme}>
-        <Component {...pageProps} />
+        <main className={inter.className}>
+          <Component {...pageProps} />
+        </main>
       </ThemeProvider>
     </CacheProvider>
   );

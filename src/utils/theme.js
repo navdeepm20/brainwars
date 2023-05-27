@@ -15,5 +15,6 @@ export const darkTheme = createTheme({
   },
   typography: {
     fontSize: 22.4,
+    fontFamily: ["Inter", "sans-serif"].join(","),
   },
 });

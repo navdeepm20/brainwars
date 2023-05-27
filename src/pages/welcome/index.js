@@ -8,6 +8,8 @@ import {
   InputLabel,
   Button,
 } from "@mui/material";
+//internal components
+import ParticleBg from "@components/particlebg";
 
 function index({ ...props }) {
   return (
@@ -18,9 +20,10 @@ function index({ ...props }) {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: (theme) => theme.palette.background.paper,
+        background: "transparent",
       }}
     >
+      <ParticleBg />
       <Paper
         sx={{
           width: "100%",
@@ -29,14 +32,21 @@ function index({ ...props }) {
           alignItems: "center",
           p: "1rem 2rem",
           border: "1px solid #333",
+          background: "transparent",
         }}
       >
-        <Typography variant="h4" mt={6} sx={{ color: "customTheme.text" }}>
+        <Typography
+          variant="h4"
+          mt={6}
+          sx={{ color: "customTheme.text" }}
+          align="center"
+        >
           Welcome to MathWars
         </Typography>
         <Typography
           variant="subtitle1"
           sx={{ color: "customTheme.text2", mb: 4 }}
+          align="center"
         >
           Let's start the Fun
         </Typography>
@@ -47,8 +57,8 @@ function index({ ...props }) {
         <Button variant="contained" fullWidth color="success">
           Start Game
         </Button>
-        <Stack class="join-create" sx={{ mt: 8 }} alignItems="center">
-          <Typography sx={{ color: "customTheme.text", mb: 4 }}>
+        <Stack className="join-create" sx={{ mt: 8 }} alignItems="center">
+          <Typography sx={{ color: "customTheme.text", mb: 4 }} align="center">
             Let's have more fun with multiplayer battles
           </Typography>
           <Stack direction="row" spacing={3}>
