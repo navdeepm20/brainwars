@@ -11,6 +11,7 @@ export const darkTheme = createTheme({
       text3: "#ffffff",
       text4: "#6d6d6d",
       bg: "#221C3E",
+      customGrey: "#333",
     },
   },
   typography: {
