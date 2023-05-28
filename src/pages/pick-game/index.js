@@ -4,10 +4,15 @@ import ExtensionOutlinedIcon from "@mui/icons-material/ExtensionOutlined";
 import CalculateOutlinedIcon from "@mui/icons-material/CalculateOutlined";
 //internal components
 import ParticleBg from "@components/particlebg";
+//nextjs
+import { useRouter } from "next/router";
 
 function index({ ...props }) {
+  const routers = useRouter();
   //handlers
-  const handleSharpShooter = (e) => {};
+  const handleSharpShooter = (e) => {
+    routers.push("/sharp-shooter");
+  };
   const handleMemoryMaster = (e) => {};
   return (
     <Container
@@ -142,6 +147,13 @@ function index({ ...props }) {
             </Stack>
           </ButtonBase>
         </Stack>
+        <Typography
+          variant="subtitle1"
+          sx={{ color: "customTheme.text2", mb: 4 }}
+          align="center"
+        >
+          Join with friends for best multiplayer experience
+        </Typography>
       </Paper>
     </Container>
   );

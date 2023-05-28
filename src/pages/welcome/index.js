@@ -10,8 +10,21 @@ import {
 } from "@mui/material";
 //internal components
 import ParticleBg from "@components/particlebg";
+//nextjs
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 function index({ ...props }) {
+  const [name, setName] = useState("");
+  const router = useRouter();
+  //handlers
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+  };
+  const handleStartGame = (e) => {
+    if (name?.length) router.push("/pick-game");
+  };
+
   return (
     <Container
       maxWidth="sm"
@@ -52,9 +65,21 @@ function index({ ...props }) {
         </Typography>
 
         <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter You Name</InputLabel>
-        <TextField id="name" fullWidth sx={{ mb: 2 }} />
+        <TextField
+          id="name"
+          fullWidth
+          sx={{ mb: 2 }}
+          value={name}
+          onChange={handleNameChange}
+        />
 
-        <Button variant="contained" fullWidth color="success">
+        <Button
+          variant="contained"
+          fullWidth
+          color="success"
+          onClick={handleStartGame}
+          disabled={!(name?.length >= 4)}
+        >
           Start Game
         </Button>
         <Stack className="join-create" sx={{ mt: 8 }} alignItems="center">
