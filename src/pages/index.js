@@ -27,18 +27,18 @@ function index({ ...props }) {
   };
   const handleStartGame = (e) => {
     if (name?.length) {
-      const promise = databases?.createDocument(
-        dbIdMappings.main,
-        collectionsMapping.user,
-        getUniqueId(),
-        {
-          name: "Test User",
-        }
-      );
-      promise.then((response) => {
-        console.log(response?.$createdAt, response?.$updatedAt);
-        router.push("/pick-game");
-      });
+      // const promise = databases?.createDocument(
+      //   dbIdMappings.main,
+      //   collectionsMapping.user,
+      //   getUniqueId(),
+      //   {
+      //     name: "Test User",
+      //   }
+      // );
+      // promise.then((response) => {
+      //   console.log(response?.$createdAt, response?.$updatedAt);
+      router.push("/pick-game");
+      // });
     }
   };
 
