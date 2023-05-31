@@ -12,26 +12,44 @@ import {
   getUniqueId,
   collectionsMapping,
 } from "@/utils/appwrite/appwriteConfig";
+//context
+import { globalContext } from "@/context/GlobalContext";
+//react
+import { useContext } from "react";
 
 function index({ games, ...props }) {
   const router = useRouter();
   const params = router.query;
+  //
+  const { currentGame, dispatch } = useContext(globalContext);
 
   //handlers
-  const handleSharpShooter = (e, gameId) => {
+  const handleSharpShooter = (e, game) => {
     if (params.name) {
+      dispatch({
+        type: "putState",
+        payload: {
+          gameId: game?.$id,
+          gameName: game?.gameName,
+          maxLifes: game?.maxLifes,
+        },
+      });
       databases.createDocument(
         dbIdMappings.main,
         collectionsMapping.game_session,
         getUniqueId(),
         {
-          gameId,
+          gameId: game?.$id,
           userName: params?.name,
         }
       );
+
+      router.push("/sharp-shooter");
     }
   };
-  const handleMemoryMaster = (e) => {};
+
+  // const handleMemoryMaster = (e) => {};
+
   return (
     <Container
       maxWidth="sm"
@@ -85,7 +103,7 @@ function index({ games, ...props }) {
               return (
                 <ButtonBase
                   onClick={(e) => {
-                    handleSharpShooter(e, game?.$id);
+                    handleSharpShooter(e, game);
                   }}
                   key={index}
                 >

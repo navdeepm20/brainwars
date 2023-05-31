@@ -4,8 +4,11 @@ import { useState, useEffect } from "react";
 import { Paper, Typography, Stack, Container, Box } from "@mui/material";
 //internal components
 import Btn1 from "@/components/buttons/Btn1";
-
 import ParticleBg from "@components/particlebg";
+//context
+import { globalContext } from "@/context/GlobalContext";
+//react
+import { useContext } from "react";
 
 //These are effective constants. You can direct tweak things from here.
 const MIN = 1;
@@ -23,6 +26,9 @@ function index({ ...props }) {
   const [answer, setAnswer] = useState("0");
   const [isCorrect, setIsCorrect] = useState(false);
   const [lifeLines, setLifeLines] = useState(MAX_LIFE_LINES);
+
+  //ctx
+  const { currentGame } = useContext(globalContext);
 
   useEffect(() => {
     generateQuestion();
@@ -132,7 +138,7 @@ function index({ ...props }) {
         }}
       >
         <Typography variant="button" sx={{ color: "success.main" }}>
-          Life: {lifeLines}❤️
+          Life: {currentGame?.maxLifes}❤️
         </Typography>
         <Typography
           variant="h5"

@@ -6,6 +6,9 @@ import { CacheProvider } from "@emotion/react";
 import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 
+//context
+import GlobalContextProvider from "@/context/GlobalContext";
+
 const clientSideEmotionCache = createEmotionCache();
 
 export default function App({
@@ -17,7 +20,9 @@ export default function App({
     <CacheProvider value={emotionCache}>
       <ThemeProvider theme={darkTheme}>
         <main className={inter.className}>
-          <Component {...pageProps} />
+          <GlobalContextProvider>
+            <Component {...pageProps} />
+          </GlobalContextProvider>
         </main>
       </ThemeProvider>
     </CacheProvider>
