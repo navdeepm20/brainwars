@@ -1,22 +1,35 @@
 //mui
 import { Paper, Container, Typography, Stack, ButtonBase } from "@mui/material";
-import ExtensionOutlinedIcon from "@mui/icons-material/ExtensionOutlined";
 import CalculateOutlinedIcon from "@mui/icons-material/CalculateOutlined";
 //internal components
 import ParticleBg from "@components/particlebg";
 //nextjs
 import { useRouter } from "next/router";
 //utils
-import { databases } from "@/utils/appwrite/appwriteConfig";
-import { dbIdMappings, collectionsMapping } from "@/utils/appwrite/dbMapping";
-import { Query } from "appwrite";
+import {
+  databases,
+  dbIdMappings,
+  getUniqueId,
+  collectionsMapping,
+} from "@/utils/appwrite/appwriteConfig";
 
 function index({ games, ...props }) {
-  const routers = useRouter();
+  const router = useRouter();
+  const params = router.query;
 
   //handlers
-  const handleSharpShooter = (e) => {
-    routers.push("/sharp-shooter");
+  const handleSharpShooter = (e, gameId) => {
+    if (params.name) {
+      databases.createDocument(
+        dbIdMappings.main,
+        collectionsMapping.game_session,
+        getUniqueId(),
+        {
+          gameId,
+          userName: params?.name,
+        }
+      );
+    }
   };
   const handleMemoryMaster = (e) => {};
   return (
@@ -70,11 +83,15 @@ function index({ games, ...props }) {
           {games?.total > 0 ? (
             games?.documents?.map((game, index) => {
               return (
-                <ButtonBase onClick={handleSharpShooter} key={index}>
+                <ButtonBase
+                  onClick={(e) => {
+                    handleSharpShooter(e, game?.$id);
+                  }}
+                  key={index}
+                >
                   <Stack
                     justifyContent="center"
-                    alignItems="center
-		  "
+                    alignItems="center"
                     spacing={2}
                     sx={{
                       border: (theme) =>

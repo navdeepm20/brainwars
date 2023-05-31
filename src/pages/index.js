@@ -14,9 +14,12 @@ import ParticleBg from "@components/particlebg";
 import { useRouter } from "next/router";
 import { useState } from "react";
 //libs
-import { databases, getUniqueId } from "../utils/appwrite/appwriteConfig";
-//utils
-import { dbIdMappings, collectionsMapping } from "@/utils/appwrite/dbMapping";
+import {
+  databases,
+  getUniqueId,
+  dbIdMappings,
+  collectionsMapping,
+} from "../utils/appwrite/appwriteConfig";
 
 function index({ ...props }) {
   const [name, setName] = useState("");
@@ -37,7 +40,10 @@ function index({ ...props }) {
       // );
       // promise.then((response) => {
       //   console.log(response?.$createdAt, response?.$updatedAt);
-      router.push("/pick-game");
+      router.push({
+        pathname: "/pick-game",
+        query: { name },
+      });
       // });
     }
   };
