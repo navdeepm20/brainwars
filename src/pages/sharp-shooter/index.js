@@ -1,38 +1,100 @@
 //react
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 //mui
 import { Paper, Typography, Stack, Container, Box } from "@mui/material";
 //internal components
 import Btn1 from "@/components/buttons/Btn1";
 import ParticleBg from "@components/particlebg";
+import ScoreCard from "./ScoreCard";
+import Loader from "@/components/loader";
 //context
-import { globalContext } from "@/context/GlobalContext";
+// import { globalContext } from "@/context/GlobalContext";
 //react
-import { useContext } from "react";
+// import { useContext } from "react";
+//appwrite
+import {
+  collectionsMapping,
+  databases,
+  dbIdMappings,
+} from "@/utils/appwrite/appwriteConfig";
+import { useRouter } from "next/router";
 
 //These are effective constants. You can direct tweak things from here.
 const MIN = 1;
-const MAX = 10;
+const MAX = 15;
 const OPERATORS = ["+", "-"];
 const OPTIONS_DEVIATION = 5;
 const NEXT_QUESTION_DELAY = 300; //in milliseconds
 const MAX_LIFE_LINES = 3;
+const MAX_SHOOTS = 5;
 
 function index({ ...props }) {
+  const router = useRouter();
+  const { id: documentId } = router.query;
+
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(null);
   const [pickedAnswer, setPickedAnswer] = useState("");
   const [isCheckingAnswer, setIsCheckingAnswer] = useState(false);
-  const [answer, setAnswer] = useState("0");
+  const [originalAnswer, setOriginalAnswer] = useState("");
   const [isCorrect, setIsCorrect] = useState(false);
-  const [lifeLines, setLifeLines] = useState(MAX_LIFE_LINES);
+  const [shootsLeft, setShootsLeft] = useState(MAX_SHOOTS);
+  const [scores, setScores] = useState({
+    right: 0,
+    wrong: 0,
+  });
+  const [loading, setLoading] = useState({
+    isSubmitting: false,
+    isLoading: false,
+  });
 
   //ctx
-  const { currentGame } = useContext(globalContext);
+  // const { currentGame } = useContext(globalContext);
+
+  const [lifeLines, setLifeLines] = useState(MAX_LIFE_LINES);
+  const isMounted = useRef(false);
+  useEffect(() => {
+    if (!isMounted.current) {
+      generateQuestion();
+      setShootsLeft((prev) => prev - 1);
+    }
+    return () => {
+      isMounted.current = true;
+    };
+  }, []);
 
   useEffect(() => {
-    generateQuestion();
-  }, []);
+    if (shootsLeft < 0 || lifeLines === 0) {
+      setLoading((prev) => {
+        return { ...prev, isSubmitting: true };
+      });
+      const promise = databases.updateDocument(
+        dbIdMappings.main,
+        collectionsMapping.game_session,
+        documentId,
+        {
+          extras: JSON.stringify({
+            rightShoots: scores?.right,
+            wrongShoots: scores?.wrong,
+            totalShoots: MAX_SHOOTS,
+            totalLifes: MAX_LIFE_LINES,
+            lifesLeft: lifeLines,
+            nextDelay: NEXT_QUESTION_DELAY,
+          }),
+        }
+      );
+      promise
+        .then((response) => {
+          setLoading((prev) => {
+            return { ...prev, isSubmitting: false };
+          });
+          console.log(response);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [shootsLeft, lifeLines]);
 
   function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -51,10 +113,10 @@ function index({ ...props }) {
     const operator = pickRandomOperator(OPERATORS);
     setQuestion(`${num1} ${operator} ${num2} =`);
     const randomAnswerIndex = getRandomInt(0, 3);
-    const answer = evaluateAnswer(num1, num2, operator);
-    const options = getOptions(answer, randomAnswerIndex);
+    const evaluatedAnswer = evaluateAnswer(num1, num2, operator);
+    const options = getOptions(evaluatedAnswer, randomAnswerIndex);
     setOptions(options);
-    setAnswer(answer);
+    setOriginalAnswer(evaluatedAnswer);
   };
 
   const evaluateAnswer = (num1, num2, operator) => {
@@ -95,19 +157,33 @@ function index({ ...props }) {
   const checkAnswer = (e, option) => {
     setIsCheckingAnswer(true);
     setPickedAnswer(option);
-    if (option === answer) {
+    if (option === originalAnswer) {
       setIsCorrect(true);
+      setScores((prev) => {
+        return { ...prev, right: prev?.right + 1 };
+      });
     } else {
       setIsCorrect(false);
       setLifeLines((prev) => (prev !== 0 ? prev - 1 : 0));
+      setScores((prev) => {
+        return { ...prev, wrong: prev?.wrong + 1 };
+      });
     }
-    setTimeout(() => {
-      //resetting states
+    if (shootsLeft > 0) {
+      setTimeout(() => {
+        //resetting states
+        setIsCheckingAnswer(false);
+        setPickedAnswer("");
+        setIsCorrect(false);
+        setShootsLeft((prev) => prev - 1);
+        generateQuestion();
+      }, NEXT_QUESTION_DELAY);
+    } else {
       setIsCheckingAnswer(false);
       setPickedAnswer("");
       setIsCorrect(false);
-      generateQuestion();
-    }, NEXT_QUESTION_DELAY);
+      setShootsLeft((prev) => prev - 1);
+    }
   };
 
   return (
@@ -129,7 +205,7 @@ function index({ ...props }) {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          p: "1rem 2rem",
+          p: "5rem 2rem",
           background: " rgba( 77, 72, 72, 0.25 )",
           boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
           backdropFilter: "blur( 4px )",
@@ -137,87 +213,143 @@ function index({ ...props }) {
           border: "1px solid rgba( 255, 255, 255, 0.18 )",
         }}
       >
-        <Typography variant="button" sx={{ color: "success.main" }}>
-          Life: {currentGame?.maxLifes}❤️
-        </Typography>
-        <Typography
-          variant="h5"
-          mt={6}
-          sx={{ color: "customTheme.text" }}
-          align="center"
-        >
-          Answer the below questions quickly
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          sx={{ color: "customTheme.text2", mb: 4 }}
-          align="center"
-        >
-          Let's Roll
-        </Typography>
+        {shootsLeft >= 0 && lifeLines > 0 ? (
+          <Typography variant="button" sx={{ color: "success.main" }}>
+            Life: {lifeLines}❤️
+          </Typography>
+        ) : (
+          <></>
+        )}
 
-        {lifeLines ? (
-          <Stack
-            className="question-answer"
-            sx={{ mt: 5 }}
-            alignItems="center"
-            pb={2}
-            mb={10}
-          >
-            <Stack direction="row" p={2} minHeight="10rem" alignItems="center">
-              <Typography variant="p" sx={{ fontSize: "4rem" }}>
-                {question}
-              </Typography>
+        <>
+          {shootsLeft >= 0 && lifeLines > 0 ? (
+            <>
               <Typography
-                variant="p"
-                sx={{
-                  fontSize: "4rem",
-                  border: (theme) =>
-                    isCheckingAnswer
-                      ? isCorrect
-                        ? `1px solid ${theme.palette.success.main}`
-                        : `1px solid ${theme.palette.error.main} `
-                      : `1px solid ${theme.palette.customTheme.customGrey}`,
-                  minWidth: "8rem",
-                  minHeight: "5rem",
-                  px: "1rem",
-                  ml: "1.5rem",
-                  cursor: "not-allowed",
-                }}
+                variant="h5"
+                mt={6}
+                sx={{ color: "customTheme.text" }}
                 align="center"
               >
-                {pickedAnswer}
+                Answer the below questions quickly
               </Typography>
-            </Stack>
-            <Box>
-              <Typography sx={{ color: "customTheme.text2" }} align="center">
-                Select the right one
-              </Typography>
-              <Stack
-                direction="row"
-                gap={2}
-                mt={3}
-                flexWrap="wrap"
-                justifyContent="center"
+              <Typography
+                variant="subtitle1"
+                sx={{ color: "customTheme.text2" }}
+                align="center"
               >
-                {options?.map((option, index) => (
-                  <Btn1
-                    variant="outlined"
-                    disabled={isCheckingAnswer}
-                    key={index}
-                    onClick={(e) => checkAnswer(e, option)}
+                Let's Roll
+              </Typography>
+            </>
+          ) : (
+            <></>
+          )}
+
+          {shootsLeft >= 0 ? (
+            lifeLines > 0 ? (
+              <Stack
+                className="question-answer"
+                sx={{ mt: 5 }}
+                alignItems="center"
+                mb={1}
+              >
+                <Stack
+                  direction="row"
+                  p={2}
+                  minHeight="10rem"
+                  alignItems="center"
+                >
+                  <Typography variant="p" sx={{ fontSize: "4rem" }}>
+                    {question}
+                  </Typography>
+                  <Typography
+                    variant="p"
+                    sx={{
+                      fontSize: "4rem",
+                      border: (theme) =>
+                        isCheckingAnswer
+                          ? isCorrect
+                            ? `1px solid ${theme.palette.success.main}`
+                            : `1px solid ${theme.palette.error.main} `
+                          : `1px solid ${theme.palette.customTheme.customGrey}`,
+                      minWidth: "8rem",
+                      minHeight: "5rem",
+                      px: "1rem",
+                      ml: "1.5rem",
+                      cursor: "not-allowed",
+                    }}
+                    align="center"
                   >
-                    {option}
-                  </Btn1>
-                ))}
+                    {pickedAnswer}
+                  </Typography>
+                </Stack>
+                <Box>
+                  <Typography
+                    sx={{ color: "customTheme.text2" }}
+                    align="center"
+                  >
+                    Select the right one
+                  </Typography>
+                  <Stack
+                    direction="row"
+                    gap={2}
+                    mt={3}
+                    flexWrap="wrap"
+                    justifyContent="center"
+                  >
+                    {options?.map((option, index) => (
+                      <Btn1
+                        variant="outlined"
+                        disabled={isCheckingAnswer}
+                        key={index}
+                        onClick={(e) => checkAnswer(e, option)}
+                      >
+                        {option}
+                      </Btn1>
+                    ))}
+                  </Stack>
+                </Box>
+                <Typography
+                  sx={{ mt: 8, color: "customTheme.text2" }}
+                  variant="button"
+                  textAlign="center"
+                >
+                  Shoots Left: {shootsLeft}
+                </Typography>
               </Stack>
-            </Box>
-          </Stack>
-        ) : (
-          <Typography sx={{ fontSize: "3rem", mb: "3rem" }}>
-            GAME OVER
-          </Typography>
-        )}
+            ) : (
+              <>
+                <Typography mt={1} mb={2} align="center">
+                  All Life's Exhausted! 💔
+                </Typography>
+                <Typography
+                  sx={{ fontSize: "3rem", mb: "3rem" }}
+                  align="center"
+                >
+                  GAME OVER
+                </Typography>
+                {loading?.isSubmitting ? (
+                  <Loader />
+                ) : (
+                  <ScoreCard scores={scores} disableMessage life={lifeLines} />
+                )}
+              </>
+            )
+          ) : (
+            <>
+              <Typography mt={1} mb={2} align="center">
+                Congratulation's 🎉
+              </Typography>
+              <Typography sx={{ fontSize: "3rem", mb: "3rem" }}>
+                GAME COMPLETED
+              </Typography>
+              {loading?.isSubmitting ? (
+                <Loader disableMessage />
+              ) : (
+                <ScoreCard completed scores={scores} life={lifeLines} />
+              )}
+            </>
+          )}
+        </>
       </Paper>
     </Container>
   );

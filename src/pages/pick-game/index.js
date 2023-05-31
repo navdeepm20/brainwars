@@ -1,5 +1,5 @@
 //mui
-import { Paper, Container, Typography, Stack, ButtonBase } from "@mui/material";
+import { Paper, Container, Typography, Stack, ButtonBase,CircularProgress } from "@mui/material";
 import CalculateOutlinedIcon from "@mui/icons-material/CalculateOutlined";
 //internal components
 import ParticleBg from "@components/particlebg";
@@ -21,7 +21,7 @@ function index({ games, ...props }) {
   const router = useRouter();
   const params = router.query;
   //
-  const { currentGame, dispatch } = useContext(globalContext);
+  const { dispatch } = useContext(globalContext);
 
   //handlers
   const handleSharpShooter = (e, game) => {
@@ -34,7 +34,7 @@ function index({ games, ...props }) {
           maxLifes: game?.maxLifes,
         },
       });
-      databases.createDocument(
+      const promise = databases.createDocument(
         dbIdMappings.main,
         collectionsMapping.game_session,
         getUniqueId(),
@@ -43,8 +43,16 @@ function index({ games, ...props }) {
           userName: params?.name,
         }
       );
-
-      router.push("/sharp-shooter");
+      promise
+        .then((response) => {
+          router.push({
+            pathname: "/sharp-shooter",
+            query: { id: response?.$id },
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   };
 

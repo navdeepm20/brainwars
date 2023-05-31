@@ -50,6 +50,7 @@ function GlobalContextProvider({ children, ...props }) {
       dispatch({ type: "putState", payload: data });
     }
   }, []);
+
   return (
     <globalContext.Provider value={{ user, setUser, currentGame, dispatch }}>
       {children}
