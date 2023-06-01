@@ -7,6 +7,7 @@ import Btn1 from "@/components/buttons/Btn1";
 import ParticleBg from "@components/particlebg";
 import ScoreCard from "./ScoreCard";
 import Loader from "@/components/loader";
+import Timer from "@/components/timer";
 //context
 // import { globalContext } from "@/context/GlobalContext";
 //react
@@ -31,7 +32,7 @@ const MAX_SHOOTS = 5;
 function index({ ...props }) {
   const router = useRouter();
   const { id: documentId } = router.query;
-
+  const [showTimer, setShowTimer] = useState(true);
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(null);
   const [pickedAnswer, setPickedAnswer] = useState("");
@@ -63,6 +64,14 @@ function index({ ...props }) {
     };
   }, []);
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setShowTimer(false);
+    }, 4000);
+    return () => {
+      clearInterval(timeoutId);
+    };
+  }, []);
   useEffect(() => {
     if (shootsLeft < 0 || lifeLines === 0) {
       setLoading((prev) => {
@@ -213,143 +222,153 @@ function index({ ...props }) {
           border: "1px solid rgba( 255, 255, 255, 0.18 )",
         }}
       >
-        {shootsLeft >= 0 && lifeLines > 0 ? (
-          <Typography variant="button" sx={{ color: "success.main" }}>
-            Life: {lifeLines}❤️
-          </Typography>
+        {showTimer ? (
+          <Timer />
         ) : (
-          <></>
-        )}
+          <>
+            {shootsLeft >= 0 && lifeLines > 0 ? (
+              <Typography variant="button" sx={{ color: "success.main" }}>
+                Life: {lifeLines}❤️
+              </Typography>
+            ) : (
+              <></>
+            )}
 
-        <>
-          {shootsLeft >= 0 && lifeLines > 0 ? (
             <>
-              <Typography
-                variant="h5"
-                mt={6}
-                sx={{ color: "customTheme.text" }}
-                align="center"
-              >
-                Answer the below questions quickly
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                sx={{ color: "customTheme.text2" }}
-                align="center"
-              >
-                Let's Roll
-              </Typography>
-            </>
-          ) : (
-            <></>
-          )}
-
-          {shootsLeft >= 0 ? (
-            lifeLines > 0 ? (
-              <Stack
-                className="question-answer"
-                sx={{ mt: 5 }}
-                alignItems="center"
-                mb={1}
-              >
-                <Stack
-                  direction="row"
-                  p={2}
-                  minHeight="10rem"
-                  alignItems="center"
-                >
-                  <Typography variant="p" sx={{ fontSize: "4rem" }}>
-                    {question}
-                  </Typography>
+              {shootsLeft >= 0 && lifeLines > 0 ? (
+                <>
                   <Typography
-                    variant="p"
-                    sx={{
-                      fontSize: "4rem",
-                      border: (theme) =>
-                        isCheckingAnswer
-                          ? isCorrect
-                            ? `1px solid ${theme.palette.success.main}`
-                            : `1px solid ${theme.palette.error.main} `
-                          : `1px solid ${theme.palette.customTheme.customGrey}`,
-                      minWidth: "8rem",
-                      minHeight: "5rem",
-                      px: "1rem",
-                      ml: "1.5rem",
-                      cursor: "not-allowed",
-                    }}
+                    variant="h5"
+                    mt={6}
+                    sx={{ color: "customTheme.text" }}
                     align="center"
                   >
-                    {pickedAnswer}
+                    Answer the below questions quickly
                   </Typography>
-                </Stack>
-                <Box>
                   <Typography
+                    variant="subtitle1"
                     sx={{ color: "customTheme.text2" }}
                     align="center"
                   >
-                    Select the right one
+                    Let's Roll
                   </Typography>
-                  <Stack
-                    direction="row"
-                    gap={2}
-                    mt={3}
-                    flexWrap="wrap"
-                    justifyContent="center"
-                  >
-                    {options?.map((option, index) => (
-                      <Btn1
-                        variant="outlined"
-                        disabled={isCheckingAnswer}
-                        key={index}
-                        onClick={(e) => checkAnswer(e, option)}
-                      >
-                        {option}
-                      </Btn1>
-                    ))}
-                  </Stack>
-                </Box>
-                <Typography
-                  sx={{ mt: 8, color: "customTheme.text2" }}
-                  variant="button"
-                  textAlign="center"
-                >
-                  Shoots Left: {shootsLeft}
-                </Typography>
-              </Stack>
-            ) : (
-              <>
-                <Typography mt={1} mb={2} align="center">
-                  All Life's Exhausted! 💔
-                </Typography>
-                <Typography
-                  sx={{ fontSize: "3rem", mb: "3rem" }}
-                  align="center"
-                >
-                  GAME OVER
-                </Typography>
-                {loading?.isSubmitting ? (
-                  <Loader />
-                ) : (
-                  <ScoreCard scores={scores} disableMessage life={lifeLines} />
-                )}
-              </>
-            )
-          ) : (
-            <>
-              <Typography mt={1} mb={2} align="center">
-                Congratulation's 🎉
-              </Typography>
-              <Typography sx={{ fontSize: "3rem", mb: "3rem" }}>
-                GAME COMPLETED
-              </Typography>
-              {loading?.isSubmitting ? (
-                <Loader disableMessage />
+                </>
               ) : (
-                <ScoreCard completed scores={scores} life={lifeLines} />
+                <></>
+              )}
+
+              {shootsLeft >= 0 ? (
+                lifeLines > 0 ? (
+                  <Stack
+                    className="question-answer"
+                    sx={{ mt: 5 }}
+                    alignItems="center"
+                    mb={1}
+                  >
+                    <Stack
+                      direction="row"
+                      p={2}
+                      minHeight="10rem"
+                      alignItems="center"
+                    >
+                      <Typography variant="p" sx={{ fontSize: "4rem" }}>
+                        {question}
+                      </Typography>
+                      <Typography
+                        variant="p"
+                        sx={{
+                          fontSize: "4rem",
+                          border: (theme) =>
+                            isCheckingAnswer
+                              ? isCorrect
+                                ? `1px solid ${theme.palette.success.main}`
+                                : `1px solid ${theme.palette.error.main} `
+                              : `1px solid ${theme.palette.customTheme.customGrey}`,
+                          minWidth: "8rem",
+                          minHeight: "5rem",
+                          px: "1rem",
+                          ml: "1.5rem",
+                          cursor: "not-allowed",
+                        }}
+                        align="center"
+                      >
+                        {pickedAnswer}
+                      </Typography>
+                    </Stack>
+                    <Box>
+                      <Typography
+                        sx={{ color: "customTheme.text2" }}
+                        align="center"
+                      >
+                        Select the right one
+                      </Typography>
+                      <Stack
+                        direction="row"
+                        gap={2}
+                        mt={3}
+                        flexWrap="wrap"
+                        justifyContent="center"
+                      >
+                        {options?.map((option, index) => (
+                          <Btn1
+                            variant="outlined"
+                            disabled={isCheckingAnswer}
+                            key={index}
+                            onClick={(e) => checkAnswer(e, option)}
+                          >
+                            {option}
+                          </Btn1>
+                        ))}
+                      </Stack>
+                    </Box>
+                    <Typography
+                      sx={{ mt: 8, color: "customTheme.text2" }}
+                      variant="button"
+                      textAlign="center"
+                    >
+                      Shoots Left: {shootsLeft}
+                    </Typography>
+                  </Stack>
+                ) : (
+                  <>
+                    <Typography mt={1} mb={2} align="center">
+                      All Life's Exhausted! 💔
+                    </Typography>
+                    <Typography
+                      sx={{ fontSize: "3rem", mb: "3rem" }}
+                      align="center"
+                    >
+                      GAME OVER
+                    </Typography>
+                    {loading?.isSubmitting ? (
+                      <Loader />
+                    ) : (
+                      <ScoreCard
+                        scores={scores}
+                        disableMessage
+                        life={lifeLines}
+                      />
+                    )}
+                  </>
+                )
+              ) : (
+                <>
+                  <Typography mt={1} mb={2} align="center">
+                    Congratulation's 🎉
+                  </Typography>
+                  <Typography sx={{ fontSize: "3rem", mb: "3rem" }}>
+                    GAME COMPLETED
+                  </Typography>
+                  {loading?.isSubmitting ? (
+                    <Loader disableMessage />
+                  ) : (
+                    <ScoreCard completed scores={scores} life={lifeLines} />
+                  )}
+                </>
               )}
             </>
-          )}
-        </>
+          </>
+        )}
       </Paper>
     </Container>
   );

@@ -40,6 +40,7 @@ function index({ ...props }) {
       // );
       // promise.then((response) => {
       //   console.log(response?.$createdAt, response?.$updatedAt);
+
       router.push({
         pathname: "/pick-game",
         query: { name },
