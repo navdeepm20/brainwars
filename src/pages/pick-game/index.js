@@ -1,5 +1,5 @@
 //mui
-import { Paper, Container, Typography, Stack, ButtonBase,CircularProgress } from "@mui/material";
+import { Paper, Container, Typography, Stack, ButtonBase } from "@mui/material";
 import CalculateOutlinedIcon from "@mui/icons-material/CalculateOutlined";
 //internal components
 import ParticleBg from "@components/particlebg";
@@ -22,7 +22,6 @@ function index({ games, ...props }) {
   const params = router.query;
   //
   const { dispatch } = useContext(globalContext);
-
   //handlers
   const handleSharpShooter = (e, game) => {
     if (params.name) {
@@ -34,6 +33,7 @@ function index({ games, ...props }) {
           maxLifes: game?.maxLifes,
         },
       });
+
       const promise = databases.createDocument(
         dbIdMappings.main,
         collectionsMapping.game_session,
@@ -51,6 +51,7 @@ function index({ games, ...props }) {
           });
         })
         .catch((err) => {
+          alert(err.message);
           console.log(err);
         });
     }

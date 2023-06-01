@@ -17,15 +17,15 @@ import {
   collectionsMapping,
   databases,
   dbIdMappings,
+  client,
 } from "@/utils/appwrite/appwriteConfig";
 import { useRouter } from "next/router";
-
 //These are effective constants. You can direct tweak things from here.
 const MIN = 1;
 const MAX = 15;
 const OPERATORS = ["+", "-"];
 const OPTIONS_DEVIATION = 5;
-const NEXT_QUESTION_DELAY = 300; //in milliseconds
+const NEXT_QUESTION_DELAY = 1000; //in milliseconds
 const MAX_LIFE_LINES = 3;
 const MAX_SHOOTS = 5;
 
@@ -54,11 +54,18 @@ function index({ ...props }) {
 
   const [lifeLines, setLifeLines] = useState(MAX_LIFE_LINES);
   const isMounted = useRef(false);
+
   useEffect(() => {
     if (!isMounted.current) {
       generateQuestion();
       setShootsLeft((prev) => prev - 1);
     }
+    client.subscribe(
+      `databases.${dbIdMappings.main}.collections.${collectionsMapping?.game_session}.documents`,
+      (response) => {
+        console.log(response.payload);
+      }
+    );
     return () => {
       isMounted.current = true;
     };
@@ -75,35 +82,50 @@ function index({ ...props }) {
   useEffect(() => {
     if (shootsLeft < 0 || lifeLines === 0) {
       setLoading((prev) => {
-        return { ...prev, isSubmitting: true };
+        return { ...prev, isLoading: true };
       });
-      const promise = databases.updateDocument(
-        dbIdMappings.main,
-        collectionsMapping.game_session,
-        documentId,
-        {
-          extras: JSON.stringify({
-            rightShoots: scores?.right,
-            wrongShoots: scores?.wrong,
-            totalShoots: MAX_SHOOTS,
-            totalLifes: MAX_LIFE_LINES,
-            lifesLeft: lifeLines,
-            nextDelay: NEXT_QUESTION_DELAY,
-          }),
-        }
-      );
-      promise
-        .then((response) => {
-          setLoading((prev) => {
-            return { ...prev, isSubmitting: false };
-          });
-          console.log(response);
-        })
-        .catch((err) => {
-          console.log(err);
+
+      setTimeout(() => {
+        setLoading((prev) => {
+          return { ...prev, isLoading: false };
         });
+      }, 3000);
     }
   }, [shootsLeft, lifeLines]);
+
+  function sendDataRealtime({ wrong, right, deductLife, ...props }) {
+    setLoading((prev) => {
+      return { ...prev, isSubmitting: true };
+    });
+    const promise = databases.updateDocument(
+      dbIdMappings.main,
+      collectionsMapping.game_session,
+      documentId,
+      {
+        extras: JSON.stringify({
+          rightShoots: scores?.right + right,
+          wrongShoots: scores?.wrong + wrong,
+          totalShoots: MAX_SHOOTS,
+          totalLifes: MAX_LIFE_LINES,
+          lifesLeft: deductLife
+            ? lifeLines > 0
+              ? lifeLines - deductLife
+              : 0
+            : lifeLines,
+          nextDelay: NEXT_QUESTION_DELAY,
+        }),
+      }
+    );
+    promise
+      .then((response) => {
+        setLoading((prev) => {
+          return { ...prev, isSubmitting: false };
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -171,13 +193,16 @@ function index({ ...props }) {
       setScores((prev) => {
         return { ...prev, right: prev?.right + 1 };
       });
+      sendDataRealtime({ right: true, wrong: false, deductLife: false });
     } else {
       setIsCorrect(false);
       setLifeLines((prev) => (prev !== 0 ? prev - 1 : 0));
       setScores((prev) => {
         return { ...prev, wrong: prev?.wrong + 1 };
       });
+      sendDataRealtime({ right: false, wrong: true, deductLife: true });
     }
+
     if (shootsLeft > 0) {
       setTimeout(() => {
         //resetting states
@@ -359,7 +384,7 @@ function index({ ...props }) {
                   <Typography sx={{ fontSize: "3rem", mb: "3rem" }}>
                     GAME COMPLETED
                   </Typography>
-                  {loading?.isSubmitting ? (
+                  {loading?.isLoading ? (
                     <Loader disableMessage />
                   ) : (
                     <ScoreCard completed scores={scores} life={lifeLines} />
