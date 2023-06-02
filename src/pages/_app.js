@@ -8,6 +8,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 //context
 import GlobalContextProvider from "@/context/GlobalContext";
+//layouts
+import GlobalLayout from "@/components/layouts/GlobalLayout";
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -21,7 +23,9 @@ export default function App({
       <ThemeProvider theme={darkTheme}>
         <main className={inter.className}>
           <GlobalContextProvider>
-            <Component {...pageProps} />
+            <GlobalLayout>
+              <Component {...pageProps} />
+            </GlobalLayout>
           </GlobalContextProvider>
         </main>
       </ThemeProvider>

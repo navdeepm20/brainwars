@@ -1,7 +1,7 @@
 //react
 import { useState, useEffect, useRef } from "react";
 //mui
-import { Paper, Typography, Stack, Container, Box } from "@mui/material";
+import { Paper, Typography, Stack, Box } from "@mui/material";
 //internal components
 import Btn1 from "@/components/buttons/Btn1";
 import ParticleBg from "@components/particlebg";
@@ -221,18 +221,8 @@ function index({ ...props }) {
   };
 
   return (
-    <Container
-      maxWidth="sm"
-      sx={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "transparent",
-      }}
-    >
+    <Box width="100%">
       <ParticleBg />
-
       <Paper
         sx={{
           width: "100%",
@@ -395,7 +385,7 @@ function index({ ...props }) {
           </>
         )}
       </Paper>
-    </Container>
+    </Box>
   );
 }
 

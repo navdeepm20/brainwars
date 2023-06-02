@@ -1,7 +1,7 @@
 //mui
 import {
   Paper,
-  Container,
+  Box,
   Typography,
   Stack,
   TextField,
@@ -21,9 +21,12 @@ import {
   collectionsMapping,
 } from "../utils/appwrite/appwriteConfig";
 
+import CreateRoom from "@/components/screens/CreateRoom";
+
 function index({ ...props }) {
   const [name, setName] = useState("");
   const router = useRouter();
+  const [isCreateRoomActive, setIsCreateRoomActive] = useState(false);
   //handlers
   const handleNameChange = (e) => {
     setName(e.target.value);
@@ -50,77 +53,75 @@ function index({ ...props }) {
   };
 
   return (
-    <Container
-      maxWidth="sm"
-      sx={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "transparent",
-      }}
-    >
+    <Box width="100%">
       <ParticleBg />
-      <Paper
-        sx={{
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          p: "1rem 2rem",
-          border: "1px solid #333",
-          background: "transparent",
-        }}
-      >
-        <Typography
-          variant="h4"
-          mt={6}
-          sx={{ color: "customTheme.text" }}
-          align="center"
+      {isCreateRoomActive ? (
+        <Paper
+          sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            p: "1rem 2rem",
+            border: "1px solid #333",
+            background: "transparent",
+          }}
         >
-          Welcome to MathWars
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          sx={{ color: "customTheme.text2", mb: 4 }}
-          align="center"
-        >
-          Let's start the Fun
-        </Typography>
-
-        <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter You Name</InputLabel>
-        <TextField
-          id="name"
-          fullWidth
-          sx={{ mb: 2 }}
-          value={name}
-          onChange={handleNameChange}
-        />
-
-        <Button
-          variant="contained"
-          fullWidth
-          color="success"
-          onClick={handleStartGame}
-          disabled={!(name?.trim("").length >= 4)}
-        >
-          Start Game
-        </Button>
-        <Stack className="join-create" sx={{ mt: 8 }} alignItems="center">
-          <Typography sx={{ color: "customTheme.text", mb: 4 }} align="center">
-            Let's have more fun with multiplayer battles
+          <Typography
+            variant="h4"
+            mt={6}
+            sx={{ color: "customTheme.text" }}
+            align="center"
+          >
+            Welcome to MathWars
           </Typography>
-          <Stack direction="row" spacing={3}>
-            <Button variant="outlined" color="primary">
-              Create Room
-            </Button>
-            <Button variant="outlined" color="secondary">
-              Join Room
-            </Button>
+          <Typography
+            variant="subtitle1"
+            sx={{ color: "customTheme.text2", mb: 4 }}
+            align="center"
+          >
+            Let's start the Fun
+          </Typography>
+
+          <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter You Name</InputLabel>
+          <TextField
+            id="name"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={name}
+            onChange={handleNameChange}
+          />
+
+          <Button
+            variant="contained"
+            fullWidth
+            color="success"
+            onClick={handleStartGame}
+            disabled={!(name?.trim("").length >= 4)}
+          >
+            Start Game
+          </Button>
+          <Stack className="join-create" sx={{ mt: 8 }} alignItems="center">
+            <Typography
+              sx={{ color: "customTheme.text", mb: 4 }}
+              align="center"
+            >
+              Let's have more fun with multiplayer battles
+            </Typography>
+            <Stack direction="row" spacing={3}>
+              <Button variant="outlined" color="primary">
+                Create Room
+              </Button>
+              <Button variant="outlined" color="secondary">
+                Join Room
+              </Button>
+            </Stack>
           </Stack>
-        </Stack>
-      </Paper>
-    </Container>
+        </Paper>
+      ) : (
+        <CreateRoom />
+      )}
+    </Box>
   );
 }
 

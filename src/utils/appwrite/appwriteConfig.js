@@ -19,4 +19,5 @@ export const dbIdMappings = {
 export const collectionsMapping = {
   game_session: "64763ff90a05163f447c",
   games: "647640695531c7a0dfab",
+  rooms: "647a4109bafa10d29c1f",
 };

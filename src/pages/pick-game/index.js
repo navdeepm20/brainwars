@@ -1,5 +1,5 @@
 //mui
-import { Paper, Container, Typography, Stack, ButtonBase } from "@mui/material";
+import { Paper, Box, Typography, Stack, ButtonBase } from "@mui/material";
 import CalculateOutlinedIcon from "@mui/icons-material/CalculateOutlined";
 //internal components
 import ParticleBg from "@components/particlebg";
@@ -15,12 +15,11 @@ import {
 //context
 import { globalContext } from "@/context/GlobalContext";
 //react
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 function index({ games, ...props }) {
   const router = useRouter();
   const params = router.query;
-  //
   const { dispatch } = useContext(globalContext);
   //handlers
   const handleSharpShooter = (e, game) => {
@@ -60,17 +59,9 @@ function index({ games, ...props }) {
   // const handleMemoryMaster = (e) => {};
 
   return (
-    <Container
-      maxWidth="sm"
-      sx={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "transparent",
-      }}
-    >
+    <Box width="100%">
       <ParticleBg />
+
       <Paper
         sx={{
           width: "100%",
@@ -98,7 +89,6 @@ function index({ games, ...props }) {
         >
           Let's choose the path to your victory
         </Typography>
-
         <Stack
           direction="row"
           className="select-game"
@@ -213,7 +203,7 @@ function index({ games, ...props }) {
           Join with friends for best multiplayer experience
         </Typography>
       </Paper>
-    </Container>
+    </Box>
   );
 }
 
