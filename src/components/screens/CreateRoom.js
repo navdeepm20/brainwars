@@ -1,8 +1,17 @@
 //mui
-import { Paper, Typography, Stack, InputLabel, TextField } from "@mui/material";
+import {
+  Paper,
+  Typography,
+  Stack,
+  InputLabel,
+  TextField,
+  Select,
+  MenuItem,
+  Box,
+} from "@mui/material";
 
 //react
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 //nextjs
 import { useRouter } from "next/router";
 import Btn1 from "../buttons/Btn1";
@@ -11,24 +20,57 @@ import {
   databases,
   dbIdMappings,
   collectionsMapping,
+  getUniqueId,
 } from "@/utils/appwrite/appwriteConfig";
+import { globalContext } from "@/context/GlobalContext";
 
 function CreateRoom({ ...props }) {
-  const [name, setName] = useState("");
-  const [participants, setParticipants] = useState("");
+  const { games } = useContext(globalContext);
+
+  const [roomName, setRoomName] = useState("");
+  const [participants, setParticipants] = useState("1");
+  const [gameId, setGameId] = useState("");
+  const [userName, setUserName] = useState("");
   const router = useRouter();
   //handlers
   const handleNameChange = (e) => {
-    setName(e.target.value);
+    setRoomName(e.target.value);
   };
-  const handleCreateRoom = (e) => {
+  const handleCreateRoom = async (e) => {
     e.preventDefault();
-
-    if (name?.length) {
+    if (userName?.length) {
       //   router.push({
       //     pathname: "/pick-game",
       //     query: { name },
       //   });
+      try {
+        const response = await databases.createDocument(
+          dbIdMappings?.main,
+          collectionsMapping?.gamers,
+          getUniqueId(),
+          {
+            name: userName,
+            isAuthenticated: false,
+          }
+        );
+        const createRoomResponse = await databases.createDocument(
+          dbIdMappings?.main,
+          collectionsMapping?.rooms,
+          getUniqueId(),
+          {
+            roomName,
+            gameId: gameId,
+            creatorId: response?.$id,
+          }
+        );
+        router.push({
+          pathname: "/lobby/[lobbyId]",
+          query: { lobbyId: `${createRoomResponse?.$id}` },
+        });
+      } catch (err) {
+        console.log(err);
+      }
+
       //   const promise = databases.createDocument(
       //     dbIdMappings.main,
       //     collectionsMapping.rooms,
@@ -54,7 +96,10 @@ function CreateRoom({ ...props }) {
         background: "transparent",
       }}
     >
-      <form onSubmit={() => alert("kajsdfkljasldjfklasjdf lasjdf")}>
+      <form
+        onSubmit={() => alert("kajsdfkljasldjfklasjdf lasjdf")}
+        style={{ width: "100%" }}
+      >
         <Typography
           variant="h4"
           mt={6}
@@ -70,18 +115,41 @@ function CreateRoom({ ...props }) {
         >
           Create your custom room
         </Typography>
-        <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter Your Room Name</InputLabel>
-        <TextField
-          id="name"
-          fullWidth
-          sx={{ mb: 4 }}
-          inputProps={{
-            maxLength: "30",
-          }}
-          value={name}
-          onChange={handleNameChange}
-          helperText="Max 30 char's only"
-        />
+
+        <Stack direction="row" gap={4}>
+          <Box>
+            <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter Your Name</InputLabel>
+            <TextField
+              id="name"
+              fullWidth
+              sx={{ mb: 4 }}
+              inputProps={{
+                maxLength: "30",
+              }}
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              helperText="Max 30 char's only"
+            />
+          </Box>
+          <Box>
+            <Stack>
+              <InputLabel sx={{ mr: "auto", mb: 1 }}>
+                Enter Your Room Name
+              </InputLabel>
+              <TextField
+                id="room_name"
+                fullWidth
+                sx={{ mb: 4 }}
+                inputProps={{
+                  maxLength: "30",
+                }}
+                value={roomName}
+                onChange={handleNameChange}
+                helperText="Max 30 char's only"
+              />
+            </Stack>
+          </Box>
+        </Stack>
         <InputLabel sx={{ mr: "auto", mb: 1 }}>
           Enter Number of Participants
         </InputLabel>
@@ -96,6 +164,18 @@ function CreateRoom({ ...props }) {
           type="number"
           helperText="Max 10 Participants Only"
         />
+        <Select
+          fullWidth
+          mb={4}
+          value={gameId}
+          onChange={(e) => setGameId(e.target.value)}
+        >
+          {games?.documents?.map((game, index) => (
+            <MenuItem key={index} value={game?.$id}>
+              {game?.gameName?.toUpperCase()}
+            </MenuItem>
+          ))}
+        </Select>
 
         <Btn1
           variant="contained"
@@ -103,11 +183,12 @@ function CreateRoom({ ...props }) {
           color="success"
           onClick={handleCreateRoom}
           disabled={
-            !(name?.trim("").length >= 4) ||
+            !(userName?.trim("").length >= 4) ||
             participants > 10 ||
             participants < 1
           }
           type="submit"
+          sx={{ mt: 4 }}
         >
           Create Room
         </Btn1>

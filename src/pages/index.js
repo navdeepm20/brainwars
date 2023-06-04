@@ -12,21 +12,28 @@ import {
 import ParticleBg from "@components/particlebg";
 //nextjs
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 //libs
 import {
   databases,
-  getUniqueId,
   dbIdMappings,
   collectionsMapping,
 } from "../utils/appwrite/appwriteConfig";
 
 import CreateRoom from "@/components/screens/CreateRoom";
+//context
+import { globalContext } from "@/context/GlobalContext";
 
-function index({ ...props }) {
+function index({ games, ...props }) {
+  const { setGames } = useContext(globalContext);
+
   const [name, setName] = useState("");
   const router = useRouter();
   const [isCreateRoomActive, setIsCreateRoomActive] = useState(false);
+
+  useEffect(() => {
+    setGames(games);
+  }, []);
   //handlers
   const handleNameChange = (e) => {
     setName(e.target.value);
@@ -126,3 +133,15 @@ function index({ ...props }) {
 }
 
 export default index;
+
+export async function getStaticProps() {
+  const response = await databases.listDocuments(
+    dbIdMappings.main,
+    collectionsMapping.games
+  );
+  return {
+    props: {
+      games: response,
+    },
+  };
+}

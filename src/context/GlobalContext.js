@@ -40,6 +40,7 @@ function GlobalContextProvider({ children, ...props }) {
   const [user, setUser] = useState({
     name: "",
   });
+  const [games, setGames] = useState({});
 
   useEffect(() => {
     const data = localStorage.getItem("current_game");
@@ -52,7 +53,9 @@ function GlobalContextProvider({ children, ...props }) {
   }, []);
 
   return (
-    <globalContext.Provider value={{ user, setUser, currentGame, dispatch }}>
+    <globalContext.Provider
+      value={{ user, setUser, currentGame, dispatch, games, setGames }}
+    >
       {children}
     </globalContext.Provider>
   );
