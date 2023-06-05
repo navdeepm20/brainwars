@@ -1,5 +1,5 @@
 //libs
-import { Client, Account, Databases, ID } from "appwrite";
+import { Client, Account, Databases, ID, Query } from "appwrite";
 
 const client = new Client();
 
@@ -22,3 +22,4 @@ export const collectionsMapping = {
   rooms: "647a4109bafa10d29c1f",
   gamers: "647b14a97db892ecf839",
 };
+export { Query };

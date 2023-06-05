@@ -23,13 +23,14 @@ import {
 import CreateRoom from "@/components/screens/CreateRoom";
 //context
 import { globalContext } from "@/context/GlobalContext";
+import JoinRoom from "@/components/screens/JoinRoom";
 
 function index({ games, ...props }) {
   const { setGames } = useContext(globalContext);
-
   const [name, setName] = useState("");
   const router = useRouter();
   const [isCreateRoomActive, setIsCreateRoomActive] = useState(false);
+  const [isJoinRoom, setIsJoinRoom] = useState(false);
 
   useEffect(() => {
     setGames(games);
@@ -62,7 +63,7 @@ function index({ games, ...props }) {
   return (
     <Box width="100%">
       <ParticleBg />
-      {!isCreateRoomActive ? (
+      {!isCreateRoomActive && !isJoinRoom ? (
         <Paper
           sx={{
             width: "100%",
@@ -71,7 +72,6 @@ function index({ games, ...props }) {
             alignItems: "center",
             p: "1rem 2rem",
             border: "1px solid #333",
-            background: "transparent",
             background: " rgba( 77, 72, 72, 0.25 )",
             boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
             backdropFilter: "blur( 4px )",
@@ -126,14 +126,20 @@ function index({ games, ...props }) {
               >
                 Create Room
               </Button>
-              <Button variant="outlined" color="secondary">
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={(e) => setIsJoinRoom(true)}
+              >
                 Join Room
               </Button>
             </Stack>
           </Stack>
         </Paper>
-      ) : (
+      ) : isCreateRoomActive ? (
         <CreateRoom />
+      ) : (
+        isJoinRoom && <JoinRoom />
       )}
     </Box>
   );

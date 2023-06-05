@@ -1,3 +1,5 @@
+//nextjs
+import dynamic from "next/dynamic";
 //mui
 import {
   Box,
@@ -6,7 +8,10 @@ import {
   Stack,
   Typography,
   alpha,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 //apwrite
 import {
   collectionsMapping,
@@ -25,23 +30,24 @@ import PlayerCard from "./PlayerCard";
 import { globalContext } from "@/context/GlobalContext";
 
 const GameRoomCard = ({ roomInfo, creatorInfo, gameInfo }) => {
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const { user } = useContext(globalContext);
 
   const [playersInfo, setPlayersInfo] = useState(null);
   useEffect(() => {
     (async () => {
       setPlayersInfo(
-        await Promise.all(
-          ["647b1be024c602284240", "647b1a92a5946e962602"]?.map(
-            async (player, index) => {
-              return await databases?.getDocument(
-                dbIdMappings?.main,
-                collectionsMapping?.gamers,
-                player
-              );
-            }
-          )
-        )
+        roomInfo
+          ? await Promise.all(
+              roomInfo?.players?.map(async (player, index) => {
+                return await databases?.getDocument(
+                  dbIdMappings?.main,
+                  collectionsMapping?.gamers,
+                  player
+                );
+              })
+            )
+          : []
       );
     })();
   }, []);
@@ -53,7 +59,8 @@ const GameRoomCard = ({ roomInfo, creatorInfo, gameInfo }) => {
         sx={{
           border: "1px solid #333",
           borderRadius: "8px",
-          minWidth: "30rem",
+          minWidth: "60rem",
+          maxWidth: "60rem",
           background: " rgba( 77, 72, 72, 0.25 )",
           boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
           backdropFilter: "blur( 4px )",
@@ -75,22 +82,49 @@ const GameRoomCard = ({ roomInfo, creatorInfo, gameInfo }) => {
           </Typography>
           <Stack
             direction="row"
-            justifyContent="center"
+            justifyContent="space-between"
             alignItems="center"
             mt={2}
-            spacing={1}
           >
+            <Stack
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+              spacing={1}
+            >
+              <Typography
+                align="center"
+                variant="body2"
+                sx={{
+                  textTransform: "uppercase",
+                  color: "customTheme.text2",
+                }}
+              >
+                STATUS: {roomInfo?.status}
+              </Typography>
+              <StatusIndicator color="success.main" />
+            </Stack>
             <Typography
-              align="center"
-              variant="body2"
               sx={{
-                textTransform: "uppercase",
                 color: "customTheme.text2",
               }}
+              onMouseOver={(e) => setIsTooltipOpen(false)}
             >
-              STATUS: {roomInfo?.status}
+              CODE: {roomInfo?.roomCode}{" "}
+              <Tooltip title="Copied to Clipboard" arrow open={isTooltipOpen}>
+                <IconButton
+                  onClick={(e) => {
+                    window?.navigator?.clipboard.writeText(roomInfo?.roomCode);
+                    setIsTooltipOpen(true);
+                  }}
+                >
+                  <ContentCopyIcon
+                    sx={{ color: "customTheme.text2" }}
+                    fontSize="small"
+                  />
+                </IconButton>
+              </Tooltip>
             </Typography>
-            <StatusIndicator color="success.main" />
           </Stack>
           <GameCard gameInfo={gameInfo} />
           <Stack rowGap={2}>

@@ -2,7 +2,14 @@ import { Stack, Typography, Box } from "@mui/material";
 
 function GameCard({ gameInfo, sx, ...props }) {
   return (
-    <Stack direction="row" justifyContent="space-between" sx={{ mt: 4, ...sx }}>
+    <Stack
+      direction="row"
+      justifyContent="space-between"
+      sx={{
+        mt: 4,
+        ...sx,
+      }}
+    >
       <Stack justifyContent="center">
         <Typography
           sx={{

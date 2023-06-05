@@ -41,10 +41,16 @@ function GlobalContextProvider({ children, ...props }) {
     name: "",
     id: "",
   });
+
   const [games, setGames] = useState({});
 
   useEffect(() => {
     const data = localStorage.getItem("current_game");
+    const userInfo = JSON.parse(localStorage.getItem("user")) || {
+      id: "",
+      name: "",
+    };
+    if (userInfo?.name?.trim("") !== "") setUser(userInfo);
     try {
       const parsedData = JSON.parse(data);
       dispatch({ type: "putState", payload: parsedData });

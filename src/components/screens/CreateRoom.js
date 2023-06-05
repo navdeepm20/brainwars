@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 
 //react
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 //nextjs
 import { useRouter } from "next/router";
 import Btn1 from "../buttons/Btn1";
@@ -22,7 +22,10 @@ import {
   collectionsMapping,
   getUniqueId,
 } from "@/utils/appwrite/appwriteConfig";
+//context
 import { globalContext } from "@/context/GlobalContext";
+//utils & helpers
+import { generateRoomCode } from "@/utils/utils";
 
 function CreateRoom({ ...props }) {
   const { games, setUser } = useContext(globalContext);
@@ -54,6 +57,10 @@ function CreateRoom({ ...props }) {
           }
         );
         setUser({ name: response?.name, id: response?.$id });
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ name: response?.name, id: response?.$id })
+        );
         const createRoomResponse = await databases.createDocument(
           dbIdMappings?.main,
           collectionsMapping?.rooms,
@@ -63,6 +70,7 @@ function CreateRoom({ ...props }) {
             gameId: gameId,
             creatorId: response?.$id,
             maxParticipants: participants,
+            roomCode: generateRoomCode(),
           }
         );
         router.push({

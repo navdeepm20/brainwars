@@ -4,8 +4,13 @@ import {
   databases,
 } from "@/utils/appwrite/appwriteConfig";
 
+//nextjs
+import dynamic from "next/dynamic";
+
 //internal
-import GameRoomCard from "@/components/cards/RoomCard";
+const GameRoomCard = dynamic(() => import("../../components/cards/RoomCard"), {
+  ssr: false,
+});
 
 function LobbyId({ roomInfo, gameInfo, creatorInfo, ...props }) {
   return (

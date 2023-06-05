@@ -22,6 +22,7 @@ const PlayerCard = ({ name, isCreator, opacity, sx, ...props }) => {
         borderRadius: "1rem",
         backgroundColor: (theme) => alpha(theme.palette.primary.main, opacity),
         cursor: "pointer",
+
         ...sx,
       }}
       direction="row"
