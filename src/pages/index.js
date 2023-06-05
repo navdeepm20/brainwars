@@ -62,7 +62,7 @@ function index({ games, ...props }) {
   return (
     <Box width="100%">
       <ParticleBg />
-      {isCreateRoomActive ? (
+      {!isCreateRoomActive ? (
         <Paper
           sx={{
             width: "100%",
@@ -72,6 +72,9 @@ function index({ games, ...props }) {
             p: "1rem 2rem",
             border: "1px solid #333",
             background: "transparent",
+            background: " rgba( 77, 72, 72, 0.25 )",
+            boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
+            backdropFilter: "blur( 4px )",
           }}
         >
           <Typography
@@ -116,7 +119,11 @@ function index({ games, ...props }) {
               Let's have more fun with multiplayer battles
             </Typography>
             <Stack direction="row" spacing={3}>
-              <Button variant="outlined" color="primary">
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={(e) => setIsCreateRoomActive(true)}
+              >
                 Create Room
               </Button>
               <Button variant="outlined" color="secondary">

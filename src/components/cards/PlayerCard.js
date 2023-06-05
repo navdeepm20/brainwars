@@ -1,10 +1,17 @@
+import { useMemo } from "react";
+//nextjs
+import dynamic from "next/dynamic";
+//mui
 import { Stack, Typography, alpha } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 //libs
-import Avatar, { genConfig } from "react-nice-avatar";
+// Dynamically import Avatar component to make it compatible with SSR
+const Avatar = dynamic(() => import("react-nice-avatar"), { ssr: false });
+import { genConfig } from "react-nice-avatar";
 
-const config = genConfig({ sex: "man" });
-const PlayerCard = ({ name, opacity, isCreator, ...props }) => {
+const PlayerCard = ({ name, isCreator, opacity, sx, ...props }) => {
+  const config = useMemo(() => genConfig(), []);
+
   return (
     <Stack
       sx={{
@@ -14,17 +21,23 @@ const PlayerCard = ({ name, opacity, isCreator, ...props }) => {
         p: "1rem 1.2rem",
         borderRadius: "1rem",
         backgroundColor: (theme) => alpha(theme.palette.primary.main, opacity),
-        ...props?.sx,
+        cursor: "pointer",
+        ...sx,
       }}
       direction="row"
+      title={isCreator ? "Room Admin" : "Player"}
+      {...props}
     >
       <Avatar
         style={{ width: "4rem", height: "4rem", marginRight: "2rem" }}
         {...config}
       />
+
       <Typography variant="h6">{name}</Typography>
       {isCreator && (
-        <StarIcon sx={{ ml: 1, fontSize: 16, color: "yellow", ml: "auto" }} />
+        <StarIcon
+          sx={{ fontSize: 16, color: "yellow", ml: "auto", cursor: "pointer" }}
+        />
       )}
     </Stack>
   );
@@ -32,7 +45,7 @@ const PlayerCard = ({ name, opacity, isCreator, ...props }) => {
 
 PlayerCard.defaultProps = {
   opacity: 0.3,
-  name: "John Doe",
-  isCreator: true,
+  name: "",
+  isCreator: false,
 };
 export default PlayerCard;

@@ -39,6 +39,7 @@ function GlobalContextProvider({ children, ...props }) {
   const [currentGame, dispatch] = useReducer(reducer, initialCurrentGameState);
   const [user, setUser] = useState({
     name: "",
+    id: "",
   });
   const [games, setGames] = useState({});
 

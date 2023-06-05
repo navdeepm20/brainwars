@@ -25,7 +25,7 @@ import {
 import { globalContext } from "@/context/GlobalContext";
 
 function CreateRoom({ ...props }) {
-  const { games } = useContext(globalContext);
+  const { games, setUser } = useContext(globalContext);
 
   const [roomName, setRoomName] = useState("");
   const [participants, setParticipants] = useState("1");
@@ -53,6 +53,7 @@ function CreateRoom({ ...props }) {
             isAuthenticated: false,
           }
         );
+        setUser({ name: response?.name, id: response?.$id });
         const createRoomResponse = await databases.createDocument(
           dbIdMappings?.main,
           collectionsMapping?.rooms,
@@ -61,6 +62,7 @@ function CreateRoom({ ...props }) {
             roomName,
             gameId: gameId,
             creatorId: response?.$id,
+            maxParticipants: participants,
           }
         );
         router.push({
@@ -93,7 +95,9 @@ function CreateRoom({ ...props }) {
         alignItems: "center",
         p: "1rem 2rem",
         border: "1px solid #333",
-        background: "transparent",
+        background: " rgba( 77, 72, 72, 0.25 )",
+        boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
+        backdropFilter: "blur( 4px )",
       }}
     >
       <form

@@ -71,7 +71,9 @@ function index({ games, ...props }) {
           p: "1rem 2rem",
           border: (theme) =>
             `1px solid ${theme.palette.customTheme.customGrey}`,
-          background: "transparent",
+          background: " rgba( 77, 72, 72, 0.25 )",
+          boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
+          backdropFilter: "blur( 4px )",
         }}
       >
         <Typography
