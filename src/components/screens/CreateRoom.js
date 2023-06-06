@@ -42,10 +42,6 @@ function CreateRoom({ ...props }) {
   const handleCreateRoom = async (e) => {
     e.preventDefault();
     if (userName?.length) {
-      //   router.push({
-      //     pathname: "/pick-game",
-      //     query: { name },
-      //   });
       try {
         const response = await databases.createDocument(
           dbIdMappings?.main,
@@ -56,6 +52,7 @@ function CreateRoom({ ...props }) {
             isAuthenticated: false,
           }
         );
+
         setUser({ name: response?.name, id: response?.$id });
         localStorage.setItem(
           "user",
@@ -72,6 +69,15 @@ function CreateRoom({ ...props }) {
             maxParticipants: participants,
             roomCode: generateRoomCode(),
           }
+        );
+        //storing in localstorage
+        localStorage.setItem(
+          "gameInfo",
+          JSON.stringify({
+            roomId: createRoomResponse?.$id,
+            playerId: response?.$id,
+            createRoom: true,
+          })
         );
         router.push({
           pathname: "/lobby/[lobbyId]",

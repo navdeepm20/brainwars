@@ -1,5 +1,5 @@
 //react
-import { useState } from "react";
+import { useContext, useState } from "react";
 //mui
 import {
   Stack,
@@ -13,20 +13,65 @@ import {
   collectionsMapping,
   databases,
   dbIdMappings,
+  getUniqueId,
   Query,
 } from "@/utils/appwrite/appwriteConfig";
+//njs
 import { useRouter } from "next/router";
+//context
+import { globalContext } from "@/context/GlobalContext";
 
 function JoinRoom({ ...props }) {
-  const [roomName, setRoomName] = useState("");
+  const { setUser, user } = useContext(globalContext);
+  const [name, setName] = useState("");
+  const [roomCode, setRoomCode] = useState("");
+  // const [roomInfo, setRoomInfo] = useState(null);
   const router = useRouter();
   const handleJoinRoom = async (e) => {
+    //create user
     try {
+      const userResponse = await databases.createDocument(
+        dbIdMappings?.main,
+        collectionsMapping?.gamers,
+        getUniqueId(),
+        {
+          isAuthenticated: false,
+          name,
+        }
+      );
+      setUser(userResponse);
+      //find room
       const response = await databases.listDocuments(
         dbIdMappings?.main,
         collectionsMapping.rooms,
-        [Query.equal("roomCode", [`${roomName}`])]
+        [Query.equal("roomCode", [`${roomCode}`])]
       );
+
+      //find if user already exist
+      const findUserResponse = databases.listDocuments(
+        dbIdMappings?.main,
+        collectionsMapping?.rooms,
+        [Query.search("players", userResponse?.$id)]
+      );
+      //update the room after creating the player
+      const roomResponse = await databases.updateDocument(
+        dbIdMappings?.main,
+        collectionsMapping.rooms,
+        response?.documents[0]?.$id,
+        {
+          players: [...response?.documents[0]?.players, userResponse?.$id],
+        }
+      );
+      //storing in localstorage
+      localStorage.setItem(
+        "gameInfo",
+        JSON.stringify({
+          roomId: roomResponse?.$id,
+          playerId: userResponse?.$id,
+          createRoom: false,
+        })
+      );
+      // setRoomInfo(roomResponse);
 
       router.push({
         pathname: "/lobby/[lobbyId]",
@@ -62,21 +107,29 @@ function JoinRoom({ ...props }) {
       >
         Conquer the battleground by joining multiplayer
       </Typography>
-      <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter You Name</InputLabel>
+      <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter Your Name</InputLabel>
       <TextField
         id="name"
         fullWidth
         sx={{ mb: 2 }}
-        value={roomName}
-        onChange={(e) => setRoomName(e.target.value)}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
 
+      <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter Room Code</InputLabel>
+      <TextField
+        id="name"
+        fullWidth
+        sx={{ mb: 2 }}
+        value={roomCode}
+        onChange={(e) => setRoomCode(e.target.value)}
+      />
       <Button
         variant="contained"
         fullWidth
         color="success"
         onClick={handleJoinRoom}
-        disabled={!(roomName?.trim("").length >= 4)}
+        disabled={name?.trim("").length <= 4 || roomCode?.trim("").length < 6}
       >
         Join Room
       </Button>

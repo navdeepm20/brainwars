@@ -1,5 +1,3 @@
-//nextjs
-import dynamic from "next/dynamic";
 //mui
 import {
   Box,
@@ -17,6 +15,7 @@ import {
   collectionsMapping,
   databases,
   dbIdMappings,
+  client,
 } from "@/utils/appwrite/appwriteConfig";
 //react
 import { useContext, useEffect, useState } from "react";
@@ -26,20 +25,91 @@ import Btn1 from "../buttons/Btn1";
 import ParticlesBg from "@/components/particlebg";
 import StatusIndicator from "@/components/status_indicator";
 import PlayerCard from "./PlayerCard";
+import Loader from "@/components/loader";
 //context
 import { globalContext } from "@/context/GlobalContext";
+//njs
+import { useRouter } from "next/router";
 
-const GameRoomCard = ({ roomInfo, creatorInfo, gameInfo }) => {
+const GameRoomCard = ({ ...props }) => {
+  const router = useRouter();
+
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
-  const { user } = useContext(globalContext);
+  const { user, setUser } = useContext(globalContext);
 
   const [playersInfo, setPlayersInfo] = useState(null);
+  const [roomData, setRoomData] = useState({});
+  const [gameInfo, setGameInfo] = useState({});
+  const [creatorInfo, setCreatorInfo] = useState({});
+  const [isGettingData, setIsGettingData] = useState(true);
+  const [roomId, setRoomId] = useState("");
+  useEffect(() => {
+    (async () => {
+      try {
+        const roomInfo = await databases.getDocument(
+          dbIdMappings.main,
+          collectionsMapping.rooms,
+          router?.asPath.split("lobby/")[1]
+        );
+        setRoomData(roomInfo);
+        setRoomId(roomInfo?.$id);
+        //get the game info
+        const gameInfo = await databases.getDocument(
+          dbIdMappings.main,
+          collectionsMapping.games,
+          roomInfo.gameId
+        );
+        setGameInfo(gameInfo);
+        //get the creator info
+        const creatorInfo = await databases.getDocument(
+          dbIdMappings.main,
+          collectionsMapping?.gamers,
+          roomInfo.creatorId
+        );
+        setCreatorInfo(creatorInfo);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setIsGettingData(false);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    const localUser = localStorage.getItem("gameInfo");
+    if (localUser) {
+      setUser(JSON.parse(localUser));
+    }
+    return () => {
+      if (roomId) {
+        try {
+          databases.updateDocument(
+            dbIdMappings?.main,
+            collectionsMapping.rooms,
+            roomId,
+            {
+              players: roomData?.players?.filter((playerId) => {
+                console.log(
+                  playerId,
+                  user?.playerId,
+                  "lkjasldkfjaldsjfakjdsfljlads;fl"
+                );
+                return playerId !== user?.playerId;
+              }),
+            }
+          );
+        } catch (err) {}
+      }
+    };
+  }, [roomId]);
+
+  //for getting the players info
   useEffect(() => {
     (async () => {
       setPlayersInfo(
-        roomInfo
+        roomData?.$id
           ? await Promise.all(
-              roomInfo?.players?.map(async (player, index) => {
+              roomData?.players?.map(async (player, index) => {
                 return await databases?.getDocument(
                   dbIdMappings?.main,
                   collectionsMapping?.gamers,
@@ -50,7 +120,19 @@ const GameRoomCard = ({ roomInfo, creatorInfo, gameInfo }) => {
           : []
       );
     })();
-  }, []);
+  }, [roomData]);
+
+  //for subscribing realtime room updates
+  useEffect(() => {
+    if (roomData?.$id)
+      client.subscribe(
+        `databases.${dbIdMappings.main}.collections.${collectionsMapping?.rooms}.documents.${roomData?.$id}`,
+        (response) => {
+          console.log(response.payload, "payload");
+          setRoomData(response?.payload);
+        }
+      );
+  }, [roomData]);
 
   return (
     <>
@@ -66,86 +148,106 @@ const GameRoomCard = ({ roomInfo, creatorInfo, gameInfo }) => {
           backdropFilter: "blur( 4px )",
         }}
       >
-        <CardContent sx={{ p: "3rem 2rem" }}>
-          <Typography
-            sx={{
-              border: ".1rem solid",
-              borderColor: "primary.secondary",
-              p: "2rem 3rem",
-              backgroundColor: (theme) =>
-                alpha(theme.palette.secondary.main, 0.2),
-              borderRadius: "8px",
-              fontSize: "2rem",
-            }}
-          >
-            Welcome to {creatorInfo?.name}'s Room
-          </Typography>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            mt={2}
-          >
-            <Stack
-              direction="row"
-              justifyContent="center"
-              alignItems="center"
-              spacing={1}
-            >
-              <Typography
-                align="center"
-                variant="body2"
-                sx={{
-                  textTransform: "uppercase",
-                  color: "customTheme.text2",
-                }}
-              >
-                STATUS: {roomInfo?.status}
-              </Typography>
-              <StatusIndicator color="success.main" />
-            </Stack>
+        {isGettingData ? (
+          <Loader />
+        ) : (
+          <CardContent sx={{ p: "3rem 2rem" }}>
             <Typography
               sx={{
-                color: "customTheme.text2",
+                border: ".1rem solid",
+                borderColor: "primary.secondary",
+                p: "2rem 3rem",
+                backgroundColor: (theme) =>
+                  alpha(theme.palette.secondary.main, 0.2),
+                borderRadius: "8px",
+                fontSize: "2rem",
               }}
-              onMouseOver={(e) => setIsTooltipOpen(false)}
             >
-              CODE: {roomInfo?.roomCode}{" "}
-              <Tooltip title="Copied to Clipboard" arrow open={isTooltipOpen}>
-                <IconButton
-                  onClick={(e) => {
-                    window?.navigator?.clipboard.writeText(roomInfo?.roomCode);
-                    setIsTooltipOpen(true);
+              Welcome to {creatorInfo?.name}'s Room
+            </Typography>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              mt={2}
+            >
+              <Stack justifyContent="flex-start">
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  sx={{ width: "100%" }}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      textTransform: "uppercase",
+                      color: "customTheme.text2",
+                      mr: "1rem",
+                    }}
+                  >
+                    STATUS: {roomData?.status}
+                  </Typography>
+                  {roomData?.status && <StatusIndicator color="success.main" />}
+                </Stack>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    textTransform: "uppercase",
+                    color: "customTheme.text2",
                   }}
                 >
-                  <ContentCopyIcon
-                    sx={{ color: "customTheme.text2" }}
-                    fontSize="small"
-                  />
-                </IconButton>
-              </Tooltip>
-            </Typography>
-          </Stack>
-          <GameCard gameInfo={gameInfo} />
-          <Stack rowGap={2}>
-            <PlayerCard
-              sx={{ mt: 4 }}
-              name={creatorInfo?.name}
-              isCreator={user?.id === roomInfo?.creatorId}
-            />
-            {playersInfo?.map((playerInfo, index) => (
-              <PlayerCard name={playerInfo?.name} key={index} />
-            ))}
-          </Stack>
+                  MAX PLAYERS: {roomData?.maxParticipants}
+                </Typography>
+              </Stack>
 
-          <Btn1
-            sx={{ m: "auto", display: "block", mt: 3, color: "success.main" }}
-            disabled={user?.id !== roomInfo?.creatorId}
-            title="Only creator can start the game"
-          >
-            Start Game
-          </Btn1>
-        </CardContent>
+              <Typography
+                sx={{
+                  color: "customTheme.text2",
+                }}
+                onMouseOver={(e) => setIsTooltipOpen(false)}
+              >
+                CODE: {roomData?.roomCode}{" "}
+                <Tooltip title="Copied to Clipboard" arrow open={isTooltipOpen}>
+                  <IconButton
+                    onClick={(e) => {
+                      window?.navigator?.clipboard.writeText(
+                        roomData?.roomCode
+                      );
+                      setIsTooltipOpen(true);
+                    }}
+                  >
+                    <ContentCopyIcon
+                      sx={{ color: "customTheme.text2" }}
+                      fontSize="small"
+                    />
+                  </IconButton>
+                </Tooltip>
+              </Typography>
+            </Stack>
+            <GameCard gameInfo={gameInfo} />
+            <Stack rowGap={2}>
+              {creatorInfo && (
+                <PlayerCard
+                  sx={{ mt: 4 }}
+                  name={creatorInfo?.name}
+                  isCreator={true}
+                />
+              )}
+
+              {playersInfo?.map((playerInfo, index) => (
+                <PlayerCard name={playerInfo?.name} key={index} />
+              ))}
+            </Stack>
+
+            <Btn1
+              sx={{ m: "auto", display: "block", mt: 3, color: "success.main" }}
+              disabled={user?.id !== roomData?.creatorId}
+              title="Only creator can start the game"
+            >
+              Start Game
+            </Btn1>
+          </CardContent>
+        )}
       </Card>
     </>
   );
