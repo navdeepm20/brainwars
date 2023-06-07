@@ -32,6 +32,7 @@ const MAX_SHOOTS = 5;
 function index({ ...props }) {
   const router = useRouter();
   const { id: documentId } = router.query;
+  const [gameSessionInfo, setGameSessionInfo] = useState(null);
   const [showTimer, setShowTimer] = useState(true);
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(null);
@@ -55,22 +56,26 @@ function index({ ...props }) {
   const [lifeLines, setLifeLines] = useState(MAX_LIFE_LINES);
   const isMounted = useRef(false);
 
+  //adding realtime updates
   useEffect(() => {
     if (!isMounted.current) {
       generateQuestion();
       setShootsLeft((prev) => prev - 1);
     }
+
     client.subscribe(
       `databases.${dbIdMappings.main}.collections.${collectionsMapping?.game_session}.documents`,
       (response) => {
         console.log(response.payload);
+        setGameSessionInfo(response.payload);
       }
     );
+
     return () => {
       isMounted.current = true;
     };
   }, []);
-
+  //for showing the start timer
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setShowTimer(false);
@@ -79,6 +84,7 @@ function index({ ...props }) {
       clearInterval(timeoutId);
     };
   }, []);
+  //abort game if shoots lefts < 0 || lifeLines === 0
   useEffect(() => {
     if (shootsLeft < 0 || lifeLines === 0) {
       setLoading((prev) => {
@@ -93,6 +99,12 @@ function index({ ...props }) {
     }
   }, [shootsLeft, lifeLines]);
 
+  //handle the updates
+  useEffect(() => {
+    if (gameSessionInfo?.extra?.isMultiplayer) {
+    }
+  }, [gameSessionInfo]);
+  //send data in realtime to server
   function sendDataRealtime({ wrong, right, deductLife, ...props }) {
     setLoading((prev) => {
       return { ...prev, isSubmitting: true };

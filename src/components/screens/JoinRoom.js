@@ -113,6 +113,7 @@ function JoinRoom({ ...props }) {
         fullWidth
         sx={{ mb: 2 }}
         value={name}
+        helperText="Min 5 characters"
         onChange={(e) => setName(e.target.value)}
       />
 

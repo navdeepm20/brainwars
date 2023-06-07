@@ -16,6 +16,8 @@ import {
   databases,
   dbIdMappings,
   client,
+  getUniqueId,
+  Query,
 } from "@/utils/appwrite/appwriteConfig";
 //react
 import { useContext, useEffect, useState } from "react";
@@ -33,16 +35,117 @@ import { useRouter } from "next/router";
 
 const GameRoomCard = ({ ...props }) => {
   const router = useRouter();
-
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const { user, setUser } = useContext(globalContext);
-
   const [playersInfo, setPlayersInfo] = useState(null);
   const [roomData, setRoomData] = useState({});
   const [gameInfo, setGameInfo] = useState({});
   const [creatorInfo, setCreatorInfo] = useState({});
   const [isGettingData, setIsGettingData] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [roomId, setRoomId] = useState("");
+  const [timeoutTime, setTimeoutTime] = useState(10);
+
+  //handlers
+  const handleStartGame = async (e) => {
+    try {
+      setIsSubmitting(true);
+      //update room status
+
+      //create gameSession for creator
+      const creatorGameSession = await databases.createDocument(
+        dbIdMappings.main,
+        collectionsMapping.game_session,
+        getUniqueId(),
+        {
+          gameId: gameInfo?.$id,
+          creatorName: creatorInfo?.name,
+          creatorId: roomData?.creatorId,
+          roomId,
+        }
+      );
+
+      //create session for all players
+      const gameSessionResponses = await Promise.all(
+        playersInfo?.map(async (player, index) => {
+          const response = await databases.createDocument(
+            dbIdMappings.main,
+            collectionsMapping.game_session,
+            getUniqueId(),
+            {
+              gameId: gameInfo?.$id,
+              creatorName: player?.name,
+              creatorId: player?.$id,
+              roomId,
+            }
+          );
+          return response?.$id;
+        })
+      );
+
+      await databases?.updateDocument(
+        dbIdMappings?.main,
+        collectionsMapping?.rooms,
+        roomId,
+        {
+          status: "InProgress",
+          gameSessions: [...gameSessionResponses, creatorGameSession?.$id],
+        }
+      );
+    } catch (err) {
+      setIsSubmitting(false);
+      console.log(err);
+    }
+  };
+  //for timer
+  const [timerId, setTimerId] = useState(null);
+
+  const startGame = () => {
+    handleStartGame();
+    const id = setInterval(() => {
+      setTimeoutTime((prev) => prev - 1);
+    }, 1000); // Start the timer
+    setTimerId(id);
+  };
+
+  //for clear interval
+  useEffect(() => {
+    return () => {
+      clearTimeout(timerId); // Clear the timer on component unmount
+    };
+  }, [timerId]);
+
+  useEffect(() => {
+    (async () => {
+      if (timeoutTime === 0) {
+        clearInterval(timerId);
+        if (roomData?.gameSessions?.length) {
+          const gameSessions = roomData?.gameSessions || [];
+
+          const gameSessionPromises = gameSessions.map(async (session) => {
+            return await databases?.getDocument(
+              dbIdMappings?.main,
+              collectionsMapping?.game_session,
+              session,
+              [Query.search("gameSessions", [session])]
+            );
+          });
+
+          const gameSessionsData = await Promise.all(gameSessionPromises);
+          const userSession = gameSessionsData.find(
+            (session) => session?.creatorId === user?.id
+          );
+          if (userSession) {
+            router.push({
+              pathname: "/sharp-shooter",
+              query: { id: userSession?.$id },
+            });
+          }
+        }
+      }
+    })();
+  }, [timeoutTime, roomData]);
+
   useEffect(() => {
     (async () => {
       try {
@@ -53,6 +156,7 @@ const GameRoomCard = ({ ...props }) => {
         );
         setRoomData(roomInfo);
         setRoomId(roomInfo?.$id);
+
         //get the game info
         const gameInfo = await databases.getDocument(
           dbIdMappings.main,
@@ -60,6 +164,7 @@ const GameRoomCard = ({ ...props }) => {
           roomInfo.gameId
         );
         setGameInfo(gameInfo);
+
         //get the creator info
         const creatorInfo = await databases.getDocument(
           dbIdMappings.main,
@@ -76,7 +181,7 @@ const GameRoomCard = ({ ...props }) => {
   }, []);
 
   useEffect(() => {
-    const localUser = localStorage.getItem("gameInfo");
+    const localUser = localStorage.getItem("user");
     if (localUser) {
       setUser(JSON.parse(localUser));
     }
@@ -89,11 +194,6 @@ const GameRoomCard = ({ ...props }) => {
             roomId,
             {
               players: roomData?.players?.filter((playerId) => {
-                console.log(
-                  playerId,
-                  user?.playerId,
-                  "lkjasldkfjaldsjfakjdsfljlads;fl"
-                );
                 return playerId !== user?.playerId;
               }),
             }
@@ -233,7 +333,6 @@ const GameRoomCard = ({ ...props }) => {
                   isCreator={true}
                 />
               )}
-
               {playersInfo?.map((playerInfo, index) => (
                 <PlayerCard name={playerInfo?.name} key={index} />
               ))}
@@ -241,11 +340,15 @@ const GameRoomCard = ({ ...props }) => {
 
             <Btn1
               sx={{ m: "auto", display: "block", mt: 3, color: "success.main" }}
-              disabled={user?.id !== roomData?.creatorId}
+              disabled={user?.id !== roomData?.creatorId || isSubmitting}
               title="Only creator can start the game"
+              onClick={startGame}
             >
               Start Game
             </Btn1>
+            <Typography align="center" sx={{ color: "customTheme.text2" }}>
+              Starting In {timeoutTime}
+            </Typography>
           </CardContent>
         )}
       </Card>

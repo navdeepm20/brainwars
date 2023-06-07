@@ -15,14 +15,14 @@ import {
 //context
 import { globalContext } from "@/context/GlobalContext";
 //react
-import { useContext, useState } from "react";
+import { useContext } from "react";
 
 function index({ games, ...props }) {
   const router = useRouter();
   const params = router.query;
   const { dispatch } = useContext(globalContext);
   //handlers
-  const handleSharpShooter = (e, game) => {
+  const handleSharpShooter = async (e, game) => {
     if (params.name) {
       dispatch({
         type: "putState",
@@ -33,15 +33,26 @@ function index({ games, ...props }) {
         },
       });
 
+      const response = await databases.createDocument(
+        dbIdMappings?.main,
+        collectionsMapping?.gamers,
+        getUniqueId(),
+        {
+          name: userName,
+          isAuthenticated: false,
+        }
+      );
       const promise = databases.createDocument(
         dbIdMappings.main,
         collectionsMapping.game_session,
         getUniqueId(),
         {
           gameId: game?.$id,
-          userName: params?.name,
+          creatorName: params?.name,
+          creatorId: response?.$id,
         }
       );
+
       promise
         .then((response) => {
           router.push({
