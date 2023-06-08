@@ -28,8 +28,8 @@ function JoinRoom({ ...props }) {
   // const [roomInfo, setRoomInfo] = useState(null);
   const router = useRouter();
   const handleJoinRoom = async (e) => {
-    //create user
     try {
+      //create user
       const userResponse = await databases.createDocument(
         dbIdMappings?.main,
         collectionsMapping?.gamers,
@@ -39,7 +39,12 @@ function JoinRoom({ ...props }) {
           name,
         }
       );
-      setUser(userResponse);
+
+      setUser({ name: userResponse?.name, id: userResponse?.$id });
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ name: userResponse?.name, id: userResponse?.$id })
+      );
       //find room
       const response = await databases.listDocuments(
         dbIdMappings?.main,
@@ -53,6 +58,7 @@ function JoinRoom({ ...props }) {
         collectionsMapping?.rooms,
         [Query.search("players", userResponse?.$id)]
       );
+
       //update the room after creating the player
       const roomResponse = await databases.updateDocument(
         dbIdMappings?.main,
@@ -64,7 +70,7 @@ function JoinRoom({ ...props }) {
       );
       //storing in localstorage
       localStorage.setItem(
-        "gameInfo",
+        "currentGameInfo",
         JSON.stringify({
           roomId: roomResponse?.$id,
           playerId: userResponse?.$id,

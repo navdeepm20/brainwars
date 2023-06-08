@@ -21,5 +21,6 @@ export const collectionsMapping = {
   games: "647640695531c7a0dfab",
   rooms: "647a4109bafa10d29c1f",
   gamers: "647b14a97db892ecf839",
+  scores: "647b1659eb098ff04c5d",
 };
 export { Query };

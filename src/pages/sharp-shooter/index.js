@@ -18,8 +18,10 @@ import {
   databases,
   dbIdMappings,
   client,
+  getUniqueId,
 } from "@/utils/appwrite/appwriteConfig";
 import { useRouter } from "next/router";
+import { calculateScores } from "./utils";
 //These are effective constants. You can direct tweak things from here.
 const MIN = 1;
 const MAX = 15;
@@ -31,7 +33,7 @@ const MAX_SHOOTS = 5;
 
 function index({ ...props }) {
   const router = useRouter();
-  const { id: documentId } = router.query;
+  const { gsid: gameSessionId, gid: gameId, rId: roomId } = router.query;
   const [gameSessionInfo, setGameSessionInfo] = useState(null);
   const [showTimer, setShowTimer] = useState(true);
   const [question, setQuestion] = useState("");
@@ -44,10 +46,13 @@ function index({ ...props }) {
   const [scores, setScores] = useState({
     right: 0,
     wrong: 0,
+    finalScore: 0,
+    totalShoots: 0,
   });
   const [loading, setLoading] = useState({
     isSubmitting: false,
     isLoading: false,
+    msg: "",
   });
 
   //ctx
@@ -84,26 +89,71 @@ function index({ ...props }) {
       clearInterval(timeoutId);
     };
   }, []);
-  //abort game if shoots lefts < 0 || lifeLines === 0
+  //abort game if shoots lefts < 0 || lifeLines === 0 (Calculate scores as well)
+  const isAlreadySubmittedRef = useRef(false);
   useEffect(() => {
-    if (shootsLeft < 0 || lifeLines === 0) {
-      setLoading((prev) => {
-        return { ...prev, isLoading: true };
-      });
+    if (
+      (lifeLines === 0 && !isAlreadySubmittedRef.current) ||
+      (shootsLeft < 0 &&
+        scores?.totalShoots === MAX_SHOOTS &&
+        !isAlreadySubmittedRef.current)
+    ) {
+      alert("going to send scores.");
+      isAlreadySubmittedRef.current = true;
 
-      setTimeout(() => {
-        setLoading((prev) => {
-          return { ...prev, isLoading: false };
+      setLoading((prev) => ({
+        ...prev,
+        isLoading: true,
+        msg: "Calculating Scores",
+      }));
+      const finalScore = calculateScores(
+        scores?.right,
+        scores?.wrong,
+        MAX_SHOOTS
+      );
+      setScores((prev) => ({
+        ...prev,
+        finalScore,
+      }));
+
+      //create scores
+      databases
+        ?.createDocument(
+          dbIdMappings?.main,
+          collectionsMapping?.scores,
+          getUniqueId(),
+          {
+            gameId,
+            gameSessionId,
+            score: finalScore,
+            extra: JSON.stringify({
+              rightAnswers: scores?.right,
+              wrongAnswers: scores?.wrong,
+              totalShoots: scores?.totalShoots,
+              lifeLines,
+            }),
+          }
+        )
+        .then((response) => {
+          setTimeout(() => {
+            setLoading((prev) => ({
+              ...prev,
+              isLoading: false,
+              msg: "Loading...",
+            }));
+            router.push({
+              pathname: "/scores",
+              query: {
+                rid: roomId,
+              },
+            });
+          }, 2000);
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      }, 3000);
     }
-  }, [shootsLeft, lifeLines]);
-
-  //handle the updates
-  useEffect(() => {
-    if (gameSessionInfo?.extra?.isMultiplayer) {
-    }
-  }, [gameSessionInfo]);
+  }, [shootsLeft, lifeLines, scores]);
   //send data in realtime to server
   function sendDataRealtime({ wrong, right, deductLife, ...props }) {
     setLoading((prev) => {
@@ -112,7 +162,7 @@ function index({ ...props }) {
     const promise = databases.updateDocument(
       dbIdMappings.main,
       collectionsMapping.game_session,
-      documentId,
+      gameSessionId,
       {
         extras: JSON.stringify({
           rightShoots: scores?.right + right,
@@ -203,14 +253,22 @@ function index({ ...props }) {
     if (option === originalAnswer) {
       setIsCorrect(true);
       setScores((prev) => {
-        return { ...prev, right: prev?.right + 1 };
+        return {
+          ...prev,
+          right: prev?.right + 1,
+          totalShoots: prev?.totalShoots + 1,
+        };
       });
       sendDataRealtime({ right: true, wrong: false, deductLife: false });
     } else {
       setIsCorrect(false);
       setLifeLines((prev) => (prev !== 0 ? prev - 1 : 0));
       setScores((prev) => {
-        return { ...prev, wrong: prev?.wrong + 1 };
+        return {
+          ...prev,
+          wrong: prev?.wrong + 1,
+          totalShoots: prev?.totalShoots + 1,
+        };
       });
       sendDataRealtime({ right: false, wrong: true, deductLife: true });
     }
@@ -368,7 +426,7 @@ function index({ ...props }) {
                       GAME OVER
                     </Typography>
                     {loading?.isSubmitting ? (
-                      <Loader />
+                      <Loader message={loading?.msg} />
                     ) : (
                       <ScoreCard
                         scores={scores}

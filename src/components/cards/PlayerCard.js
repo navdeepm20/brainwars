@@ -4,12 +4,13 @@ import dynamic from "next/dynamic";
 //mui
 import { Stack, Typography, alpha } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
+import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
 //libs
 // Dynamically import Avatar component to make it compatible with SSR
 const Avatar = dynamic(() => import("react-nice-avatar"), { ssr: false });
 import { genConfig } from "react-nice-avatar";
 
-const PlayerCard = ({ name, isCreator, opacity, sx, ...props }) => {
+const PlayerCard = ({ name, isCreator, opacity, isWinner, sx, ...props }) => {
   const config = useMemo(() => genConfig(), []);
 
   return (
@@ -33,8 +34,14 @@ const PlayerCard = ({ name, isCreator, opacity, sx, ...props }) => {
         style={{ width: "4rem", height: "4rem", marginRight: "2rem" }}
         {...config}
       />
-
-      <Typography variant="h6">{name}</Typography>
+      <Stack direction="row" alignItems="center">
+        <Typography variant="h6">{name}</Typography>
+        {isWinner && (
+          <MilitaryTechIcon
+            sx={{ fontSize: 20, color: "yellow", ml: 1, cursor: "pointer" }}
+          />
+        )}
+      </Stack>
       {isCreator && (
         <StarIcon
           sx={{ fontSize: 16, color: "yellow", ml: "auto", cursor: "pointer" }}

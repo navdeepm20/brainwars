@@ -11,6 +11,7 @@ function index({ message, disableMessage, ...props }) {
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "column",
+        minHeight: "20rem",
         py: 2,
         ...props?.sx,
       }}

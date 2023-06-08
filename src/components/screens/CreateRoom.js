@@ -72,10 +72,11 @@ function CreateRoom({ ...props }) {
         );
         //storing in localstorage
         localStorage.setItem(
-          "gameInfo",
+          "currentGameInfo",
           JSON.stringify({
             roomId: createRoomResponse?.$id,
             playerId: response?.$id,
+            playerName: response?.name,
             createRoom: true,
           })
         );
@@ -86,17 +87,6 @@ function CreateRoom({ ...props }) {
       } catch (err) {
         console.log(err);
       }
-
-      //   const promise = databases.createDocument(
-      //     dbIdMappings.main,
-      //     collectionsMapping.rooms,
-      //     getUniqueId(),
-      //     {
-      //       roomName: name,
-      //       gameId: "", //todo: add option to select game
-      //       creatorId: "", // todo: assign temp creator id and create temp user table.
-      //     }
-      //   );
     }
   };
 

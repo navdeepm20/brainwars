@@ -43,6 +43,7 @@ const GameRoomCard = ({ ...props }) => {
   const [creatorInfo, setCreatorInfo] = useState({});
   const [isGettingData, setIsGettingData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [startTimer, setStartTimer] = useState(false);
   const [roomId, setRoomId] = useState("");
   const [timeoutTime, setTimeoutTime] = useState(10);
 
@@ -100,12 +101,18 @@ const GameRoomCard = ({ ...props }) => {
   //for timer
   const [timerId, setTimerId] = useState(null);
 
-  const startGame = () => {
-    handleStartGame();
+  //start timer
+  const startGameTimer = () => {
+    setStartTimer(true);
     const id = setInterval(() => {
       setTimeoutTime((prev) => prev - 1);
     }, 1000); // Start the timer
     setTimerId(id);
+  };
+  //start game
+  const startGame = async () => {
+    await handleStartGame();
+    startGameTimer();
   };
 
   //for clear interval
@@ -115,6 +122,7 @@ const GameRoomCard = ({ ...props }) => {
     };
   }, [timerId]);
 
+  //for handling timeout time and room data
   useEffect(() => {
     (async () => {
       if (timeoutTime === 0) {
@@ -135,10 +143,15 @@ const GameRoomCard = ({ ...props }) => {
           const userSession = gameSessionsData.find(
             (session) => session?.creatorId === user?.id
           );
+
           if (userSession) {
             router.push({
               pathname: "/sharp-shooter",
-              query: { id: userSession?.$id },
+              query: {
+                gsid: userSession?.$id,
+                gid: userSession?.gameId,
+                rId: roomId,
+              },
             });
           }
         }
@@ -146,6 +159,7 @@ const GameRoomCard = ({ ...props }) => {
     })();
   }, [timeoutTime, roomData]);
 
+  //for fetching room,game and creator info.
   useEffect(() => {
     (async () => {
       try {
@@ -183,6 +197,7 @@ const GameRoomCard = ({ ...props }) => {
   useEffect(() => {
     const localUser = localStorage.getItem("user");
     if (localUser) {
+      alert("setting user");
       setUser(JSON.parse(localUser));
     }
     return () => {
@@ -205,6 +220,9 @@ const GameRoomCard = ({ ...props }) => {
 
   //for getting the players info
   useEffect(() => {
+    if (roomData?.status?.toLowerCase() === "inprogress") {
+      startGameTimer();
+    }
     (async () => {
       setPlayersInfo(
         roomData?.$id
@@ -346,9 +364,11 @@ const GameRoomCard = ({ ...props }) => {
             >
               Start Game
             </Btn1>
-            <Typography align="center" sx={{ color: "customTheme.text2" }}>
-              Starting In {timeoutTime}
-            </Typography>
+            {startTimer && (
+              <Typography align="center" sx={{ color: "customTheme.text2" }}>
+                Starting In {timeoutTime}
+              </Typography>
+            )}
           </CardContent>
         )}
       </Card>
