@@ -20,13 +20,7 @@ export default LobbyId;
 
 export async function getStaticPaths(context) {
   return {
-    paths: [
-      {
-        params: {
-          lobbyId: "1",
-        },
-      },
-    ],
+    paths: [],
     fallback: true,
   };
 }

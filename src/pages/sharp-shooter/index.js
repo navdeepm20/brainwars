@@ -5,13 +5,10 @@ import { Paper, Typography, Stack, Box } from "@mui/material";
 //internal components
 import Btn1 from "@/components/buttons/Btn1";
 import ParticleBg from "@components/particlebg";
-import ScoreCard from "./ScoreCard";
+import ScoreCard from "@components/cards/ScoresCard";
 import Loader from "@/components/loader";
 import Timer from "@/components/timer";
-//context
-// import { globalContext } from "@/context/GlobalContext";
-//react
-// import { useContext } from "react";
+
 //appwrite
 import {
   collectionsMapping,
@@ -21,7 +18,9 @@ import {
   getUniqueId,
 } from "@/utils/appwrite/appwriteConfig";
 import { useRouter } from "next/router";
-import { calculateScores } from "./utils";
+import { calculateScores } from "@/utils/components/sharpShooter.js";
+import { getModeId } from "@/utils/utils";
+import { gameModeId } from "@/utils/constants";
 //These are effective constants. You can direct tweak things from here.
 const MIN = 1;
 const MAX = 15;
@@ -34,7 +33,9 @@ const MAX_SHOOTS = 5;
 function index({ ...props }) {
   const router = useRouter();
   const { gsid: gameSessionId, gid: gameId, rId: roomId } = router.query;
-  const [gameSessionInfo, setGameSessionInfo] = useState(null);
+  const [modeId, setModeId] = useState();
+
+  // const [gameSessionInfo, setGameSessionInfo] = useState(null);
   const [showTimer, setShowTimer] = useState(true);
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(null);
@@ -67,12 +68,12 @@ function index({ ...props }) {
       generateQuestion();
       setShootsLeft((prev) => prev - 1);
     }
-
+    setModeId(getModeId());
     client.subscribe(
       `databases.${dbIdMappings.main}.collections.${collectionsMapping?.game_session}.documents`,
       (response) => {
         console.log(response.payload);
-        setGameSessionInfo(response.payload);
+        // setGameSessionInfo(response.payload);
       }
     );
 
@@ -141,12 +142,25 @@ function index({ ...props }) {
               isLoading: false,
               msg: "Loading...",
             }));
-            router.push({
-              pathname: "/scores",
-              query: {
-                rid: roomId,
-              },
-            });
+
+            if (modeId) {
+              if (modeId === gameModeId?.multi)
+                router.push({
+                  pathname: "/scores",
+                  query: {
+                    rid: roomId,
+                  },
+                });
+              else
+                router.push({
+                  pathname: "/scores",
+                  query: {
+                    gsid: gameSessionId,
+                  },
+                });
+            } else {
+              alert("mode not found");
+            }
           }, 2000);
         })
         .catch((err) => {

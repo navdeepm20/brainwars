@@ -1,5 +1,7 @@
+//mui
 import { Container } from "@mui/material";
-import React from "react";
+//react
+
 function GlobalLayout({ children, ...props }) {
   return (
     <Container

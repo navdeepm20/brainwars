@@ -1,7 +1,7 @@
 //mui
 import { CircularProgress, Paper, Typography } from "@mui/material";
 
-function index({ message, disableMessage, ...props }) {
+function index({ message, disableMessage, disableMinHeight, ...props }) {
   return (
     <Paper
       elevation={0}
@@ -11,7 +11,7 @@ function index({ message, disableMessage, ...props }) {
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "column",
-        minHeight: "20rem",
+        minHeight: disableMinHeight ? 0 : "20rem",
         py: 2,
         ...props?.sx,
       }}

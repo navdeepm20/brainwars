@@ -8,7 +8,10 @@ import {
   Select,
   MenuItem,
   Box,
+  Fade,
+  IconButton,
 } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 //react
 import { useContext, useState } from "react";
@@ -27,7 +30,7 @@ import { globalContext } from "@/context/GlobalContext";
 //utils & helpers
 import { generateRoomCode } from "@/utils/utils";
 
-function CreateRoom({ ...props }) {
+function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
   const { games, setUser } = useContext(globalContext);
 
   const [roomName, setRoomName] = useState("");
@@ -91,128 +94,142 @@ function CreateRoom({ ...props }) {
   };
 
   return (
-    <Paper
-      sx={{
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        p: "1rem 2rem",
-        border: "1px solid #333",
-        background: " rgba( 77, 72, 72, 0.25 )",
-        boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
-        backdropFilter: "blur( 4px )",
-      }}
-    >
-      <form
-        onSubmit={() => alert("kajsdfkljasldjfklasjdf lasjdf")}
-        style={{ width: "100%" }}
+    <Fade in={true}>
+      <Paper
+        sx={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          p: "1rem 2rem",
+          border: "1px solid #333",
+          background: " rgba( 77, 72, 72, 0.25 )",
+          boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
+          backdropFilter: "blur( 4px )",
+        }}
       >
-        <Typography
-          variant="h4"
-          mt={6}
-          sx={{ color: "customTheme.text" }}
-          align="center"
+        <IconButton
+          sx={{ justifyContent: "flex-start", alignSelf: "flex-start" }}
+          onClick={goBackHandler}
         >
-          Let's Have Fun With Friends
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          sx={{ color: "customTheme.text2", mb: 4 }}
-          align="center"
+          <ArrowBackIcon />
+        </IconButton>
+        <form
+          onSubmit={() => alert("kajsdfkljasldjfklasjdf lasjdf")}
+          style={{ width: "100%" }}
         >
-          Create your custom room
-        </Typography>
+          <Typography
+            variant="h4"
+            mt={6}
+            sx={{ color: "customTheme.text" }}
+            align="center"
+          >
+            Let's Have Fun With Friends
+          </Typography>
+          <Typography
+            variant="subtitle1"
+            sx={{ color: "customTheme.text2", mb: 4 }}
+            align="center"
+          >
+            Create your custom room
+          </Typography>
 
-        <Stack direction="row" gap={4}>
-          <Box>
-            <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter Your Name</InputLabel>
-            <TextField
-              id="name"
-              fullWidth
-              sx={{ mb: 4 }}
-              inputProps={{
-                maxLength: "30",
-              }}
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              helperText="Max 30 char's only"
-            />
-          </Box>
-          <Box>
-            <Stack>
+          <Stack direction="row" gap={4}>
+            <Box>
               <InputLabel sx={{ mr: "auto", mb: 1 }}>
-                Enter Your Room Name
+                Enter Your Name
               </InputLabel>
               <TextField
-                id="room_name"
+                id="name"
                 fullWidth
                 sx={{ mb: 4 }}
                 inputProps={{
                   maxLength: "30",
                 }}
-                value={roomName}
-                onChange={handleNameChange}
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
                 helperText="Max 30 char's only"
               />
-            </Stack>
-          </Box>
-        </Stack>
-        <InputLabel sx={{ mr: "auto", mb: 1 }}>
-          Enter Number of Participants
-        </InputLabel>
-        <TextField
-          id="name"
-          fullWidth
-          sx={{ mb: 6 }}
-          value={participants}
-          onChange={(e) => {
-            setParticipants(e.target.value);
-          }}
-          type="number"
-          helperText="Max 10 Participants Only"
-        />
-        <Select
-          fullWidth
-          mb={4}
-          value={gameId}
-          onChange={(e) => setGameId(e.target.value)}
-        >
-          {games?.documents?.map((game, index) => (
-            <MenuItem key={index} value={game?.$id}>
-              {game?.gameName?.toUpperCase()}
-            </MenuItem>
-          ))}
-        </Select>
+            </Box>
+            <Box>
+              <Stack>
+                <InputLabel sx={{ mr: "auto", mb: 1 }}>
+                  Enter Your Room Name
+                </InputLabel>
+                <TextField
+                  id="room_name"
+                  fullWidth
+                  sx={{ mb: 4 }}
+                  inputProps={{
+                    maxLength: "30",
+                  }}
+                  value={roomName}
+                  onChange={handleNameChange}
+                  helperText="Max 30 char's only"
+                />
+              </Stack>
+            </Box>
+          </Stack>
+          <InputLabel sx={{ mr: "auto", mb: 1 }}>
+            Enter Number of Participants
+          </InputLabel>
+          <TextField
+            id="name"
+            fullWidth
+            sx={{ mb: 6 }}
+            value={participants}
+            onChange={(e) => {
+              setParticipants(e.target.value);
+            }}
+            type="number"
+            helperText="Max 10 Participants Only"
+          />
+          <Select
+            fullWidth
+            mb={4}
+            value={gameId}
+            onChange={(e) => setGameId(e.target.value)}
+          >
+            {games?.documents?.map((game, index) => (
+              <MenuItem key={index} value={game?.$id}>
+                {game?.gameName?.toUpperCase()}
+              </MenuItem>
+            ))}
+          </Select>
 
-        <Btn1
-          variant="contained"
-          fullWidth
-          color="success"
-          onClick={handleCreateRoom}
-          disabled={
-            !(userName?.trim("").length >= 4) ||
-            participants > 10 ||
-            participants < 1
-          }
-          type="submit"
-          sx={{ mt: 4 }}
-        >
-          Create Room
-        </Btn1>
-      </form>
-
-      <Stack className="join-create" sx={{ mt: 8 }} alignItems="center">
-        <Typography sx={{ color: "customTheme.text", mb: 4 }} align="center">
-          Don't want to create? Join a room
-        </Typography>
-        <Stack direction="row" spacing={3}>
-          <Btn1 variant="outlined" color="secondary">
-            Join Room
+          <Btn1
+            variant="contained"
+            fullWidth
+            color="success"
+            onClick={handleCreateRoom}
+            disabled={
+              !(userName?.trim("").length >= 4) ||
+              participants > 10 ||
+              participants < 1
+            }
+            type="submit"
+            sx={{ mt: 4 }}
+          >
+            Create Room
           </Btn1>
+        </form>
+
+        <Stack className="join-create" sx={{ mt: 8 }} alignItems="center">
+          <Typography sx={{ color: "customTheme.text", mb: 4 }} align="center">
+            Don't want to create? Join a room
+          </Typography>
+          <Stack direction="row" spacing={3}>
+            <Btn1
+              variant="outlined"
+              color="secondary"
+              onClick={joinRoomHandler}
+            >
+              Join Room
+            </Btn1>
+          </Stack>
         </Stack>
-      </Stack>
-    </Paper>
+      </Paper>
+    </Fade>
   );
 }
 

@@ -7,7 +7,10 @@ import {
   InputLabel,
   TextField,
   Button,
+  Fade,
+  IconButton,
 } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 //appwrite
 import {
   collectionsMapping,
@@ -21,8 +24,8 @@ import { useRouter } from "next/router";
 //context
 import { globalContext } from "@/context/GlobalContext";
 
-function JoinRoom({ ...props }) {
-  const { setUser, user } = useContext(globalContext);
+function JoinRoom({ goBackHandler, ...props }) {
+  const { setUser } = useContext(globalContext);
   const [name, setName] = useState("");
   const [roomCode, setRoomCode] = useState("");
   // const [roomInfo, setRoomInfo] = useState(null);
@@ -89,58 +92,66 @@ function JoinRoom({ ...props }) {
   };
 
   return (
-    <Stack
-      sx={{
-        border: "1px solid #333",
-        background: " rgba( 77, 72, 72, 0.25 )",
-        boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
-        backdropFilter: "blur( 4px )",
-        py: 5,
-        px: 3,
-      }}
-    >
-      <Typography
-        variant="h4"
-        sx={{ color: "customTheme.text" }}
-        align="center"
+    <Fade in={true}>
+      <Stack
+        sx={{
+          border: "1px solid #333",
+          background: " rgba( 77, 72, 72, 0.25 )",
+          boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
+          backdropFilter: "blur( 4px )",
+          py: 5,
+          px: 3,
+        }}
       >
-        Join the Battle
-      </Typography>
-      <Typography
-        variant="subtitle1"
-        sx={{ color: "customTheme.text2", mb: 4 }}
-        align="center"
-      >
-        Conquer the battleground by joining multiplayer
-      </Typography>
-      <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter Your Name</InputLabel>
-      <TextField
-        id="name"
-        fullWidth
-        sx={{ mb: 2 }}
-        value={name}
-        helperText="Min 5 characters"
-        onChange={(e) => setName(e.target.value)}
-      />
+        <IconButton
+          sx={{ justifyContent: "flex-start", alignSelf: "flex-start" }}
+          onClick={goBackHandler}
+        >
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography
+          variant="h4"
+          sx={{ color: "customTheme.text" }}
+          align="center"
+        >
+          Join the Battle
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{ color: "customTheme.text2", mb: 4 }}
+          align="center"
+        >
+          Conquer the battleground by joining multiplayer
+        </Typography>
+        <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter Your Name</InputLabel>
+        <TextField
+          id="name"
+          fullWidth
+          sx={{ mb: 2 }}
+          value={name}
+          helperText="Min 5 characters"
+          onChange={(e) => setName(e.target.value)}
+        />
 
-      <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter Room Code</InputLabel>
-      <TextField
-        id="name"
-        fullWidth
-        sx={{ mb: 2 }}
-        value={roomCode}
-        onChange={(e) => setRoomCode(e.target.value)}
-      />
-      <Button
-        variant="contained"
-        fullWidth
-        color="success"
-        onClick={handleJoinRoom}
-        disabled={name?.trim("").length <= 4 || roomCode?.trim("").length < 6}
-      >
-        Join Room
-      </Button>
-    </Stack>
+        <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter Room Code</InputLabel>
+        <TextField
+          id="name"
+          fullWidth
+          sx={{ mb: 2 }}
+          value={roomCode}
+          onChange={(e) => setRoomCode(e.target.value)}
+        />
+        <Button
+          variant="contained"
+          fullWidth
+          color="success"
+          onClick={handleJoinRoom}
+          disabled={name?.trim("").length <= 4 || roomCode?.trim("").length < 6}
+        >
+          Join Room
+        </Button>
+      </Stack>
+    </Fade>
   );
 }
 

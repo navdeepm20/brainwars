@@ -42,6 +42,12 @@ function GlobalContextProvider({ children, ...props }) {
     id: "",
   });
 
+  const [metaInfo, setMetaInfo] = useState({
+    gameMode: "",
+    gameModeId: "",
+    isGameStarted: false,
+  });
+
   const [games, setGames] = useState({});
 
   useEffect(() => {
@@ -61,7 +67,16 @@ function GlobalContextProvider({ children, ...props }) {
 
   return (
     <globalContext.Provider
-      value={{ user, setUser, currentGame, dispatch, games, setGames }}
+      value={{
+        user,
+        setUser,
+        currentGame,
+        dispatch,
+        games,
+        setGames,
+        metaInfo,
+        setMetaInfo,
+      }}
     >
       {children}
     </globalContext.Provider>

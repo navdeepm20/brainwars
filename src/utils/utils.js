@@ -10,3 +10,6 @@ export const generateRoomCode = (codeLength = 6) => {
 
   return roomCode;
 };
+
+export const getModeId = () => sessionStorage.getItem("mid");
+export const setModeId = (id) => sessionStorage.setItem("mid", id);

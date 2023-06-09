@@ -17,8 +17,7 @@ import Btn1 from "@/components/buttons/Btn1";
 import ParticlesBg from "@/components/particlebg";
 import PlayerCard from "@/components/cards/PlayerCard";
 import Loader from "@/components/loader";
-//context
-import { globalContext } from "@/context/GlobalContext";
+
 //njs
 import { useRouter } from "next/router";
 //utils
@@ -27,20 +26,23 @@ import {
   fetchRoomInfo,
   fetchGameSessionsInfo,
   fetchScoresInfo,
-  calculateScores,
-} from "./utils";
+  calculateMultiPlayerScores,
+  calculateSinglePlayerScores,
+  getScore,
+  getPlayerInfo,
+  getGameSession,
+} from "@/utils/components/scores";
 
 //internal
-import { particlesConfig } from "@/components/particlebg/confettiConfig";
 import ConfettiAnimation from "@/components/confetti";
 
 function index({ ...props }) {
   const router = useRouter();
-  const { rid: roomId } = router.query;
+  const { rid: roomId, gsid: gameSessionId } = router.query;
 
   const [gameInfo, setGameInfo] = useState({});
 
-  const [isGettingData, setIsGettingData] = useState(false);
+  const [isGettingData, setIsGettingData] = useState(true);
   const [finalScores, setFinalScores] = useState(null);
 
   useEffect(() => {
@@ -49,7 +51,6 @@ function index({ ...props }) {
         try {
           setIsGettingData(true);
           const roomInfo = await fetchRoomInfo(roomId);
-          console.log(roomInfo);
 
           const allLinkedGameSessions = await fetchGameSessionsInfo(
             roomInfo?.gameSessions
@@ -62,7 +63,7 @@ function index({ ...props }) {
             allLinkedGameSessions
           );
 
-          const finalCalculatedScores = calculateScores(
+          const finalCalculatedScores = calculateMultiPlayerScores(
             allLinkedPlayersScores,
             allLinkedGameSessions,
             roomInfo
@@ -75,6 +76,20 @@ function index({ ...props }) {
           console.log(err);
           setIsGettingData(false);
         }
+      })();
+    } else if (gameSessionId) {
+      (async () => {
+        const scoresInfo = await getScore(gameSessionId);
+        const gameSessionInfo = await getGameSession(gameSessionId);
+        const gameInfo = await fetchGameInfo(gameSessionInfo?.gameId);
+        setGameInfo(gameInfo);
+        const playerInfo = await getPlayerInfo(gameSessionInfo?.creatorId);
+        const finalCalculatedScores = calculateSinglePlayerScores(
+          scoresInfo?.documents[0]?.score,
+          playerInfo
+        );
+        setFinalScores(finalCalculatedScores);
+        setIsGettingData(false);
       })();
     }
   }, [router]);
@@ -120,14 +135,17 @@ function index({ ...props }) {
                   key={index}
                   isCreator={score?.isCreator}
                   isWinner={index === 0}
+                  score={score?.score}
                 />
               ))}
             </Stack>
 
             <Btn1
               sx={{ m: "auto", display: "block", mt: 3, color: "success.main" }}
-              title="Only creator can start the game"
-              onClick={() => {}}
+              title="Go back to home"
+              onClick={() => {
+                router.push("/");
+              }}
             >
               Back to Home
             </Btn1>

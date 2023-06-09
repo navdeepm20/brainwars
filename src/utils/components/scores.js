@@ -6,16 +6,14 @@ import {
 } from "@/utils/appwrite/appwriteConfig";
 
 export const getScore = async (sessionId) => {
-  console.log(sessionId, "asdf");
   return await databases?.listDocuments(
     dbIdMappings?.main,
     collectionsMapping?.scores,
-    [Query.search("gameSessionId", sessionId)]
+    [Query.search("gameSessionId", sessionId), Query.orderDesc("$createdAt")]
   );
 };
 
 export const fetchScoresInfo = async (gameSessions) => {
-  console.log(gameSessions);
   return await Promise.all(
     gameSessions?.map(async (session, index) => await getScore(session?.$id))
   );
@@ -33,7 +31,7 @@ export const fetchGameSessionsInfo = async (gameSessions) => {
   );
 };
 
-export const fetchPlayerInfo = async (playerId) => {
+export const getPlayerInfo = async (playerId) => {
   return await databases?.getDocument(
     dbIdMappings?.main,
     collectionsMapping?.gamers,
@@ -44,7 +42,7 @@ export const fetchPlayerInfo = async (playerId) => {
 export const fetchCreatorsInfo = async (gameSessionsArray) => {
   return await Promise.all(
     gameSessionsArray?.map(
-      async (session, index) => await fetchPlayerInfo(session?.creatorId)
+      async (session, index) => await getPlayerInfo(session?.creatorId)
     )
   );
 };
@@ -65,15 +63,18 @@ export const fetchRoomInfo = async (roomId) => {
   );
 };
 
-export const calculateScores = (scoresArray, gameSessionArray, roomInfo) => {
+export const calculateMultiPlayerScores = (
+  scoresArray,
+  gameSessionArray,
+  roomInfo
+) => {
   let calculatedScoresArray = [];
   gameSessionArray?.map((session) => {
     const foundScore = scoresArray?.find((scoreInfo) => {
       if (scoreInfo?.total) {
-        console.log(scoreInfo?.documents[0]?.gameSessionId, session?.$id);
         return scoreInfo?.documents[0]?.gameSessionId === session?.$id;
       } else {
-        console.log("not found ");
+        alert("not found ");
       }
     });
     calculatedScoresArray.push({
@@ -87,4 +88,15 @@ export const calculateScores = (scoresArray, gameSessionArray, roomInfo) => {
     });
   });
   return calculatedScoresArray;
+};
+
+export const calculateSinglePlayerScores = (score, playerInfo) => {
+  return [
+    {
+      playerName: playerInfo?.name,
+      playerId: playerInfo?.$id,
+      score,
+      isCreator: false,
+    },
+  ];
 };

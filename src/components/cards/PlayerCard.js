@@ -10,7 +10,15 @@ import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
 const Avatar = dynamic(() => import("react-nice-avatar"), { ssr: false });
 import { genConfig } from "react-nice-avatar";
 
-const PlayerCard = ({ name, isCreator, opacity, isWinner, sx, ...props }) => {
+const PlayerCard = ({
+  name,
+  isCreator,
+  opacity,
+  isWinner,
+  score,
+  sx,
+  ...props
+}) => {
   const config = useMemo(() => genConfig(), []);
 
   return (
@@ -42,6 +50,9 @@ const PlayerCard = ({ name, isCreator, opacity, isWinner, sx, ...props }) => {
           />
         )}
       </Stack>
+      <Typography>
+        {score !== null && score !== undefined ? score : "-"}
+      </Typography>
       {isCreator && (
         <StarIcon
           sx={{ fontSize: 16, color: "yellow", ml: "auto", cursor: "pointer" }}
