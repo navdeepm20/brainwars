@@ -6,7 +6,6 @@ import {
   Typography,
   InputLabel,
   TextField,
-  Button,
   Fade,
   IconButton,
 } from "@mui/material";
@@ -23,31 +22,23 @@ import {
 import { useRouter } from "next/router";
 //context
 import { globalContext } from "@/context/GlobalContext";
+//internal
+import LoadingButton from "../buttons/LoadingBtn";
+//utils
+import { gameModeId } from "@/utils/constants";
+import { setModeId } from "@/utils/utils";
 
 function JoinRoom({ goBackHandler, ...props }) {
-  const { setUser } = useContext(globalContext);
+  const { setUser, setMetaInfo } = useContext(globalContext);
   const [name, setName] = useState("");
   const [roomCode, setRoomCode] = useState("");
+  const [isJoiningRoom, setIsJoiningRoom] = useState(false);
   // const [roomInfo, setRoomInfo] = useState(null);
   const router = useRouter();
   const handleJoinRoom = async (e) => {
     try {
-      //create user
-      const userResponse = await databases.createDocument(
-        dbIdMappings?.main,
-        collectionsMapping?.gamers,
-        getUniqueId(),
-        {
-          isAuthenticated: false,
-          name,
-        }
-      );
+      setIsJoiningRoom(true);
 
-      setUser({ name: userResponse?.name, id: userResponse?.$id });
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ name: userResponse?.name, id: userResponse?.$id })
-      );
       //find room
       const response = await databases.listDocuments(
         dbIdMappings?.main,
@@ -55,38 +46,68 @@ function JoinRoom({ goBackHandler, ...props }) {
         [Query.equal("roomCode", [`${roomCode}`])]
       );
 
-      //find if user already exist
-      const findUserResponse = databases.listDocuments(
-        dbIdMappings?.main,
-        collectionsMapping?.rooms,
-        [Query.search("players", userResponse?.$id)]
-      );
+      if (
+        response?.total &&
+        response?.documents[0]?.players?.length >=
+          response?.documents[0]?.maxParticipants - 1
+      ) {
+        alert("Room is full");
+      } else {
+        //create user
+        const userResponse = await databases.createDocument(
+          dbIdMappings?.main,
+          collectionsMapping?.gamers,
+          getUniqueId(),
+          {
+            isAuthenticated: false,
+            name,
+          }
+        );
+        setUser({ name: userResponse?.name, id: userResponse?.$id });
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ name: userResponse?.name, id: userResponse?.$id })
+        );
+        //find if user already exist
+        const findUserResponse = databases.listDocuments(
+          dbIdMappings?.main,
+          collectionsMapping?.rooms,
+          [Query.search("players", userResponse?.$id)]
+        );
+        //update the room after creating the player
+        const roomResponse = await databases.updateDocument(
+          dbIdMappings?.main,
+          collectionsMapping.rooms,
+          response?.documents[0]?.$id,
+          {
+            players: [...response?.documents[0]?.players, userResponse?.$id],
+          }
+        );
+        //storing in localstorage
+        localStorage.setItem(
+          "currentGameInfo",
+          JSON.stringify({
+            roomId: roomResponse?.$id,
+            playerId: userResponse?.$id,
+            createRoom: false,
+          })
+        );
+        // setRoomInfo(roomResponse);
+        setMetaInfo({
+          gameMode: "single",
+          modeId: gameModeId?.multi,
+          isGameStarted: false,
+        });
+        setModeId(gameModeId?.multi);
+        router.push({
+          pathname: "/lobby/[lobbyId]",
+          query: { lobbyId: `${response?.documents[0]?.$id}` },
+        });
+      }
 
-      //update the room after creating the player
-      const roomResponse = await databases.updateDocument(
-        dbIdMappings?.main,
-        collectionsMapping.rooms,
-        response?.documents[0]?.$id,
-        {
-          players: [...response?.documents[0]?.players, userResponse?.$id],
-        }
-      );
-      //storing in localstorage
-      localStorage.setItem(
-        "currentGameInfo",
-        JSON.stringify({
-          roomId: roomResponse?.$id,
-          playerId: userResponse?.$id,
-          createRoom: false,
-        })
-      );
-      // setRoomInfo(roomResponse);
-
-      router.push({
-        pathname: "/lobby/[lobbyId]",
-        query: { lobbyId: `${response?.documents[0]?.$id}` },
-      });
+      setIsJoiningRoom(false);
     } catch (err) {
+      setIsJoiningRoom(false);
       console.log(err);
     }
   };
@@ -141,15 +162,16 @@ function JoinRoom({ goBackHandler, ...props }) {
           value={roomCode}
           onChange={(e) => setRoomCode(e.target.value)}
         />
-        <Button
+        <LoadingButton
           variant="contained"
           fullWidth
           color="success"
           onClick={handleJoinRoom}
           disabled={name?.trim("").length <= 4 || roomCode?.trim("").length < 6}
+          isLoading={isJoiningRoom}
         >
           Join Room
-        </Button>
+        </LoadingButton>
       </Stack>
     </Fade>
   );

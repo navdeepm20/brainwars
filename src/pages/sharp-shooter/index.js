@@ -73,7 +73,6 @@ function index({ ...props }) {
       `databases.${dbIdMappings.main}.collections.${collectionsMapping?.game_session}.documents`,
       (response) => {
         console.log(response.payload);
-        // setGameSessionInfo(response.payload);
       }
     );
 
@@ -99,7 +98,6 @@ function index({ ...props }) {
         scores?.totalShoots === MAX_SHOOTS &&
         !isAlreadySubmittedRef.current)
     ) {
-      alert("going to send scores.");
       isAlreadySubmittedRef.current = true;
 
       setLoading((prev) => ({

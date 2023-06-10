@@ -197,7 +197,6 @@ const GameRoomCard = ({ ...props }) => {
   useEffect(() => {
     const localUser = localStorage.getItem("user");
     if (localUser) {
-      alert("setting user");
       setUser(JSON.parse(localUser));
     }
     return () => {
@@ -280,6 +279,7 @@ const GameRoomCard = ({ ...props }) => {
                 borderRadius: "8px",
                 fontSize: "2rem",
               }}
+              align="center"
             >
               Welcome to {creatorInfo?.name}'s Room
             </Typography>

@@ -73,9 +73,8 @@ export const calculateMultiPlayerScores = (
     const foundScore = scoresArray?.find((scoreInfo) => {
       if (scoreInfo?.total) {
         return scoreInfo?.documents[0]?.gameSessionId === session?.$id;
-      } else {
-        alert("not found ");
       }
+      return false;
     });
     calculatedScoresArray.push({
       playerName: session?.creatorName,

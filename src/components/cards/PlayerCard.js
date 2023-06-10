@@ -16,6 +16,7 @@ const PlayerCard = ({
   opacity,
   isWinner,
   score,
+
   sx,
   ...props
 }) => {
@@ -44,20 +45,40 @@ const PlayerCard = ({
       />
       <Stack direction="row" alignItems="center">
         <Typography variant="h6">{name}</Typography>
+        {isCreator && (
+          <span title="Room Admin">
+            <StarIcon
+              sx={{
+                fontSize: 16,
+                color: "yellow",
+                ml: ".5rem",
+                cursor: "pointer",
+              }}
+            />
+          </span>
+        )}
+
         {isWinner && (
-          <MilitaryTechIcon
-            sx={{ fontSize: 20, color: "yellow", ml: 1, cursor: "pointer" }}
-          />
+          <span title="Winner">
+            <MilitaryTechIcon
+              sx={{
+                fontSize: 20,
+                color: "yellow",
+                ml: ".5rem",
+                cursor: "pointer",
+              }}
+            />
+          </span>
         )}
       </Stack>
-      <Typography>
-        {score !== null && score !== undefined ? score : "-"}
-      </Typography>
-      {isCreator && (
-        <StarIcon
-          sx={{ fontSize: 16, color: "yellow", ml: "auto", cursor: "pointer" }}
-        />
-      )}
+      <Stack direction="row" sx={{ ml: "auto" }}>
+        <Typography component="span">
+          Score:
+          <Typography component="span" sx={{ ml: ".5rem" }}>
+            {score !== null && score !== undefined ? score : ""}
+          </Typography>
+        </Typography>
+      </Stack>
     </Stack>
   );
 };

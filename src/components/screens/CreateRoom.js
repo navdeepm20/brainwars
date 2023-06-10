@@ -12,12 +12,13 @@ import {
   IconButton,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+//internal
 
 //react
 import { useContext, useState } from "react";
 //nextjs
 import { useRouter } from "next/router";
-import Btn1 from "../buttons/Btn1";
+import LoadingBtn from "../buttons/LoadingBtn";
 //utils
 import {
   databases,
@@ -28,16 +29,18 @@ import {
 //context
 import { globalContext } from "@/context/GlobalContext";
 //utils & helpers
-import { generateRoomCode } from "@/utils/utils";
+import { generateRoomCode, setModeId } from "@/utils/utils";
+//utils
+import { gameModeId } from "@/utils/constants";
 
 function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
-  const { games, setUser } = useContext(globalContext);
-
+  const { games, setUser, setMetaInfo } = useContext(globalContext);
   const [roomName, setRoomName] = useState("");
   const [participants, setParticipants] = useState("1");
   const [gameId, setGameId] = useState("");
   const [userName, setUserName] = useState("");
   const router = useRouter();
+  const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   //handlers
   const handleNameChange = (e) => {
     setRoomName(e.target.value);
@@ -46,6 +49,7 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
     e.preventDefault();
     if (userName?.length) {
       try {
+        setIsCreatingRoom(true);
         const response = await databases.createDocument(
           dbIdMappings?.main,
           collectionsMapping?.gamers,
@@ -83,11 +87,20 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
             createRoom: true,
           })
         );
+
+        setMetaInfo({
+          gameMode: "single",
+          modeId: gameModeId?.multi,
+          isGameStarted: false,
+        });
+        setModeId(gameModeId?.multi);
         router.push({
           pathname: "/lobby/[lobbyId]",
           query: { lobbyId: `${createRoomResponse?.$id}` },
         });
+        setIsCreatingRoom(false);
       } catch (err) {
+        setIsCreatingRoom(false);
         console.log(err);
       }
     }
@@ -114,10 +127,7 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
         >
           <ArrowBackIcon />
         </IconButton>
-        <form
-          onSubmit={() => alert("kajsdfkljasldjfklasjdf lasjdf")}
-          style={{ width: "100%" }}
-        >
+        <form onSubmit={handleCreateRoom} style={{ width: "100%" }}>
           <Typography
             variant="h4"
             mt={6}
@@ -197,21 +207,23 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
             ))}
           </Select>
 
-          <Btn1
+          <LoadingBtn
             variant="contained"
             fullWidth
             color="success"
-            onClick={handleCreateRoom}
             disabled={
               !(userName?.trim("").length >= 4) ||
               participants > 10 ||
-              participants < 1
+              participants < 1 ||
+              !(roomName?.trim("").length >= 4) ||
+              !(gameId?.trim("").length >= 5)
             }
             type="submit"
             sx={{ mt: 4 }}
+            isLoading={isCreatingRoom}
           >
             Create Room
-          </Btn1>
+          </LoadingBtn>
         </form>
 
         <Stack className="join-create" sx={{ mt: 8 }} alignItems="center">
@@ -219,13 +231,13 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
             Don't want to create? Join a room
           </Typography>
           <Stack direction="row" spacing={3}>
-            <Btn1
+            <LoadingBtn
               variant="outlined"
               color="secondary"
               onClick={joinRoomHandler}
             >
               Join Room
-            </Btn1>
+            </LoadingBtn>
           </Stack>
         </Stack>
       </Paper>
