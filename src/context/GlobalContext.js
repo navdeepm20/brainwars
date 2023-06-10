@@ -7,6 +7,7 @@ function GlobalContextProvider({ children, ...props }) {
     gameName: "",
     gameType: "",
     maxLifes: 0,
+    extra: {},
   };
 
   //for current game
@@ -26,6 +27,7 @@ function GlobalContextProvider({ children, ...props }) {
             gameName: action?.payload?.gameName,
             gameType: action?.payload?.gameType,
             maxLifes: action?.payload?.maxLifes,
+            extra: action?.payload?.extra || {},
           })
         );
         return {
@@ -33,6 +35,7 @@ function GlobalContextProvider({ children, ...props }) {
           gameName: action?.payload?.gameName,
           gameType: action?.payload?.gameType,
           maxLifes: action?.payload?.maxLifes,
+          extra: action?.payload?.extra || {},
         };
     }
   };

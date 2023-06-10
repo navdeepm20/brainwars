@@ -28,7 +28,7 @@ const OPERATORS = ["+", "-"];
 const OPTIONS_DEVIATION = 5;
 const NEXT_QUESTION_DELAY = 1000; //in milliseconds
 const MAX_LIFE_LINES = 3;
-const MAX_SHOOTS = 5;
+const MAX_SHOOTS = 10;
 
 function index({ ...props }) {
   const router = useRouter();
@@ -44,6 +44,9 @@ function index({ ...props }) {
   const [originalAnswer, setOriginalAnswer] = useState("");
   const [isCorrect, setIsCorrect] = useState(false);
   const [shootsLeft, setShootsLeft] = useState(MAX_SHOOTS);
+  const [intervalId, setIntervalId] = useState(null);
+  const [scoresRedirectTimer, setScoresRedirectTimer] = useState(5);
+  const isAlreadySubmittedRef = useRef(false);
   const [scores, setScores] = useState({
     right: 0,
     wrong: 0,
@@ -80,6 +83,7 @@ function index({ ...props }) {
       isMounted.current = true;
     };
   }, []);
+
   //for showing the start timer
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -89,8 +93,9 @@ function index({ ...props }) {
       clearInterval(timeoutId);
     };
   }, []);
+
   //abort game if shoots lefts < 0 || lifeLines === 0 (Calculate scores as well)
-  const isAlreadySubmittedRef = useRef(false);
+
   useEffect(() => {
     if (
       (lifeLines === 0 && !isAlreadySubmittedRef.current) ||
@@ -134,6 +139,11 @@ function index({ ...props }) {
           }
         )
         .then((response) => {
+          setIntervalId(
+            setInterval(() => {
+              setScoresRedirectTimer((prev) => (prev > 0 ? prev - 1 : 0));
+            }, 1000)
+          );
           setTimeout(() => {
             setLoading((prev) => ({
               ...prev,
@@ -141,31 +151,56 @@ function index({ ...props }) {
               msg: "Loading...",
             }));
 
-            if (modeId) {
-              if (modeId === gameModeId?.multi)
-                router.push({
-                  pathname: "/scores",
-                  query: {
-                    rid: roomId,
-                  },
-                });
-              else
-                router.push({
-                  pathname: "/scores",
-                  query: {
-                    gsid: gameSessionId,
-                  },
-                });
-            } else {
-              alert("mode not found");
-            }
-          }, 2000);
+            // if (modeId) {
+            //   if (modeId === gameModeId?.multi)
+            //     router.push({
+            //       pathname: "/scores",
+            //       query: {
+            //         rid: roomId,
+            //       },
+            //     });
+            //   else
+            //     router.push({
+            //       pathname: "/scores",
+            //       query: {
+            //         gsid: gameSessionId,
+            //       },
+            //     });
+            // } else {
+            //   alert("mode not found");
+            // }
+          }, 5000);
         })
         .catch((err) => {
           console.log(err);
         });
     }
   }, [shootsLeft, lifeLines, scores]);
+
+  useEffect(() => {
+    console.log(intervalId, scoresRedirectTimer);
+    if (intervalId && scoresRedirectTimer === 0) {
+      clearInterval(intervalId);
+      if (modeId) {
+        if (modeId === gameModeId?.multi)
+          router.push({
+            pathname: "/scores",
+            query: {
+              rid: roomId,
+            },
+          });
+        else
+          router.push({
+            pathname: "/scores",
+            query: {
+              gsid: gameSessionId,
+            },
+          });
+      } else {
+        alert("mode not found");
+      }
+    }
+  }, [intervalId, scoresRedirectTimer]);
   //send data in realtime to server
   function sendDataRealtime({ wrong, right, deductLife, ...props }) {
     setLoading((prev) => {
@@ -444,6 +479,7 @@ function index({ ...props }) {
                         scores={scores}
                         disableMessage
                         life={lifeLines}
+                        timer={scoresRedirectTimer}
                       />
                     )}
                   </>
@@ -459,7 +495,12 @@ function index({ ...props }) {
                   {loading?.isLoading ? (
                     <Loader disableMessage />
                   ) : (
-                    <ScoreCard completed scores={scores} life={lifeLines} />
+                    <ScoreCard
+                      completed
+                      scores={scores}
+                      life={lifeLines}
+                      timer={scoresRedirectTimer}
+                    />
                   )}
                 </>
               )}

@@ -23,7 +23,7 @@ import { getModeId } from "@/utils/utils";
 function index({ games, ...props }) {
   const router = useRouter();
   const params = router.query;
-  const { dispatch, metaInfo } = useContext(globalContext);
+  const { dispatch } = useContext(globalContext);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   //handlers
@@ -36,6 +36,7 @@ function index({ games, ...props }) {
           payload: {
             gameId: game?.$id,
             gameName: game?.gameName,
+            gameType: game?.gameType,
             maxLifes: game?.maxLifes,
           },
         });

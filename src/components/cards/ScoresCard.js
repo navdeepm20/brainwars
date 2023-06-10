@@ -1,7 +1,7 @@
 //mui
 import { Box, Typography, Stack } from "@mui/material";
 
-function ScoreCard({ completed, scores, life, ...props }) {
+function ScoreCard({ completed, scores, life, timer, ...props }) {
   return (
     <>
       {completed ? (
@@ -31,6 +31,12 @@ function ScoreCard({ completed, scores, life, ...props }) {
           >
             LIFE: {life}❤️
           </Typography>
+          <Typography
+            align="center"
+            sx={{ color: "customTheme.text2", mt: "5rem" }}
+          >
+            Redirecting in {timer}
+          </Typography>
         </Box>
       ) : (
         <Box>
@@ -58,6 +64,12 @@ function ScoreCard({ completed, scores, life, ...props }) {
             }}
           >
             LIFE: {life} {"  "}💔
+          </Typography>
+          <Typography
+            align="center"
+            sx={{ color: "customTheme.text2", mt: "5rem" }}
+          >
+            Redirecting in {timer}
           </Typography>
         </Box>
       )}

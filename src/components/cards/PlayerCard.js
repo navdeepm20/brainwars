@@ -65,6 +65,7 @@ const PlayerCard = ({
                 fontSize: 20,
                 color: "yellow",
                 ml: ".5rem",
+                mt: ".7rem",
                 cursor: "pointer",
               }}
             />

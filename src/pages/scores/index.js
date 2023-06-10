@@ -39,9 +39,7 @@ import ConfettiAnimation from "@/components/confetti";
 function index({ ...props }) {
   const router = useRouter();
   const { rid: roomId, gsid: gameSessionId } = router.query;
-
   const [gameInfo, setGameInfo] = useState({});
-
   const [isGettingData, setIsGettingData] = useState(true);
   const [finalScores, setFinalScores] = useState(null);
 
