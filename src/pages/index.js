@@ -39,10 +39,12 @@ function index({ games, ...props }) {
   useEffect(() => {
     setGames(games);
   }, []);
+
   //handlers
   const handleNameChange = (e) => {
     setName(e.target.value);
   };
+
   const handleStartGame = (e) => {
     if (name?.length) {
       setMetaInfo({

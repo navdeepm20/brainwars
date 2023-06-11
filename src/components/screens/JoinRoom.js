@@ -27,6 +27,7 @@ import LoadingButton from "../buttons/LoadingBtn";
 //utils
 import { gameModeId } from "@/utils/constants";
 import { setModeId } from "@/utils/utils";
+import { getRandomAvatarUrl } from "@/utils/components/pickGame";
 
 function JoinRoom({ goBackHandler, ...props }) {
   const { setUser, setMetaInfo } = useContext(globalContext);
@@ -53,6 +54,7 @@ function JoinRoom({ goBackHandler, ...props }) {
       ) {
         alert("Room is full");
       } else {
+        const avatarUrl = await getRandomAvatarUrl();
         //create user
         const userResponse = await databases.createDocument(
           dbIdMappings?.main,
@@ -61,6 +63,7 @@ function JoinRoom({ goBackHandler, ...props }) {
           {
             isAuthenticated: false,
             name,
+            avatarUrl,
           }
         );
         setUser({ name: userResponse?.name, id: userResponse?.$id });

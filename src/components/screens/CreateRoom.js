@@ -32,6 +32,7 @@ import { globalContext } from "@/context/GlobalContext";
 import { generateRoomCode, setModeId } from "@/utils/utils";
 //utils
 import { gameModeId } from "@/utils/constants";
+import { getRandomAvatarUrl } from "@/utils/components/pickGame";
 
 function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
   const { games, setUser, setMetaInfo } = useContext(globalContext);
@@ -50,6 +51,7 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
     if (userName?.length) {
       try {
         setIsCreatingRoom(true);
+        const avatarUrl = await getRandomAvatarUrl();
         const response = await databases.createDocument(
           dbIdMappings?.main,
           collectionsMapping?.gamers,
@@ -57,6 +59,7 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
           {
             name: userName,
             isAuthenticated: false,
+            avatarUrl,
           }
         );
 

@@ -1,18 +1,30 @@
 //libs
-import { Client, Account, Databases, ID, Query } from "appwrite";
+import {
+  Client,
+  Account,
+  Databases,
+  ID,
+  Query,
+  Functions,
+  Storage,
+} from "appwrite";
+
+//CONSTANTS
+export const BUCKET_ID = "6486209e7496dfc1c1e1";
 
 const client = new Client();
 
 client
   .setEndpoint("https://cloud.appwrite.io/v1")
   .setProject("647397b32af423f24577");
+
 export const account = new Account(client);
 export { client };
 //Databases
 export const databases = new Databases(client);
 
 export const getUniqueId = () => ID.unique();
-
+export const functions = new Functions(client);
 export const dbIdMappings = {
   main: "6474f5b1e46fff9d49c8",
 };
@@ -23,4 +35,6 @@ export const collectionsMapping = {
   gamers: "647b14a97db892ecf839",
   scores: "647b1659eb098ff04c5d",
 };
+
 export { Query };
+export const storage = new Storage(client);

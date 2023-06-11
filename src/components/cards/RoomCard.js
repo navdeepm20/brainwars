@@ -348,11 +348,16 @@ const GameRoomCard = ({ ...props }) => {
                 <PlayerCard
                   sx={{ mt: 4 }}
                   name={creatorInfo?.name}
+                  avatarUrl={creatorInfo?.avatarUrl}
                   isCreator={true}
                 />
               )}
               {playersInfo?.map((playerInfo, index) => (
-                <PlayerCard name={playerInfo?.name} key={index} />
+                <PlayerCard
+                  name={playerInfo?.name}
+                  key={index}
+                  avatarUrl={playerInfo?.avatarUrl}
+                />
               ))}
             </Stack>
 

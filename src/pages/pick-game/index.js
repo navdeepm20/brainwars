@@ -19,13 +19,14 @@ import { globalContext } from "@/context/GlobalContext";
 import { useContext } from "react";
 import { useState } from "react";
 import { getModeId } from "@/utils/utils";
+import { getRandomAvatarUrl } from "@/utils/components/pickGame";
 
 function index({ games, ...props }) {
   const router = useRouter();
   const params = router.query;
   const { dispatch } = useContext(globalContext);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   //handlers
   const handleSharpShooter = async (e, game) => {
     if (params.name) {
@@ -41,6 +42,8 @@ function index({ games, ...props }) {
           },
         });
         setIsSubmitting(true);
+        const avatarUrl = await getRandomAvatarUrl();
+
         const response = await databases.createDocument(
           dbIdMappings?.main,
           collectionsMapping?.gamers,
@@ -48,6 +51,7 @@ function index({ games, ...props }) {
           {
             name: params?.name,
             isAuthenticated: false,
+            avatarUrl: avatarUrl,
           }
         );
         const promise = databases.createDocument(

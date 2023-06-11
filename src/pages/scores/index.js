@@ -1,13 +1,6 @@
 //mui
-//mui
-import {
-  Box,
-  Card,
-  CardContent,
-  Stack,
-  Typography,
-  alpha,
-} from "@mui/material";
+
+import { Card, CardContent, Stack, Typography, alpha } from "@mui/material";
 
 //react
 import { useEffect, useState } from "react";
@@ -32,6 +25,8 @@ import {
   getPlayerInfo,
   getGameSession,
 } from "@/utils/components/scores";
+
+import { functions } from "@/utils/appwrite/appwriteConfig";
 
 //internal
 import ConfettiAnimation from "@/components/confetti";
@@ -61,15 +56,35 @@ function index({ ...props }) {
             allLinkedGameSessions
           );
 
-          const finalCalculatedScores = calculateMultiPlayerScores(
-            allLinkedPlayersScores,
-            allLinkedGameSessions,
-            roomInfo
-          );
+          // const finalCalculatedScores = calculateMultiPlayerScores(
+          //   allLinkedPlayersScores,
+          //   allLinkedGameSessions,
+          //   roomInfo
+          // );
+          functions
+            .createExecution(
+              "6485aeaf40916b78b283",
+              JSON.stringify({
+                mode: "multi",
+                data: {
+                  allLinkedPlayersScores,
+                  allLinkedGameSessions,
+                  roomInfo,
+                },
+              })
+            )
+            .then((response) => {
+              console.log(response);
+              const parsedData = JSON.parse(response?.response);
+              setFinalScores(parsedData?.scoreInfo); // Handle the function execution response
+              setIsGettingData(false);
+            })
+            .catch((error) => {
+              console.error(error); // Handle any errors that occur
+              setIsGettingData(false);
+            });
 
-          setFinalScores(finalCalculatedScores);
-
-          setIsGettingData(false);
+          // setFinalScores(finalCalculatedScores);
         } catch (err) {
           console.log(err);
           setIsGettingData(false);
@@ -82,12 +97,33 @@ function index({ ...props }) {
         const gameInfo = await fetchGameInfo(gameSessionInfo?.gameId);
         setGameInfo(gameInfo);
         const playerInfo = await getPlayerInfo(gameSessionInfo?.creatorId);
-        const finalCalculatedScores = calculateSinglePlayerScores(
-          scoresInfo?.documents[0]?.score,
-          playerInfo
-        );
-        setFinalScores(finalCalculatedScores);
-        setIsGettingData(false);
+        // const finalCalculatedScores = calculateSinglePlayerScores(
+        //   scoresInfo?.documents[0]?.score,
+        //   playerInfo
+        // );
+        // setFinalScores(finalCalculatedScores);
+
+        //cloud function to calculate the scores.
+        functions
+          .createExecution(
+            "6485aeaf40916b78b283",
+            JSON.stringify({
+              mode: "single",
+              data: {
+                score: scoresInfo?.documents[0]?.score,
+                playerInfo,
+              },
+            })
+          )
+          .then((response) => {
+            const parsedData = JSON.parse(response?.response);
+            setFinalScores(parsedData?.scoreInfo); // Handle the function execution response
+            setIsGettingData(false);
+          })
+          .catch((error) => {
+            console.error(error, "ljljlkj"); // Handle any errors that occur
+            setIsGettingData(false);
+          });
       })();
     }
   }, [router]);
@@ -127,15 +163,18 @@ function index({ ...props }) {
 
             <GameCard gameInfo={gameInfo} />
             <Stack rowGap={2} mt={4}>
-              {finalScores?.map((score, index) => (
-                <PlayerCard
-                  name={score?.playerName}
-                  key={index}
-                  isCreator={score?.isCreator}
-                  isWinner={index === 0}
-                  score={score?.score}
-                />
-              ))}
+              {finalScores?.map((score, index) => {
+                return (
+                  <PlayerCard
+                    avatarUrl={score?.avatarUrl}
+                    name={score?.playerName}
+                    key={index}
+                    isCreator={score?.isCreator}
+                    isWinner={index === 0}
+                    score={score?.score}
+                  />
+                );
+              })}
             </Stack>
 
             <Btn1
