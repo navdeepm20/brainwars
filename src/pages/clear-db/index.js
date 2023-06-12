@@ -2,8 +2,8 @@
 import { Paper, Box, Typography, TextField, InputLabel } from "@mui/material";
 //internal components
 import ParticleBg from "@components/particlebg";
-//nextjs
-import { useRouter } from "next/router";
+import Button from "@components/buttons/Btn1";
+
 import { useState, useContext, useEffect } from "react";
 //libs
 import {
@@ -12,10 +12,8 @@ import {
   collectionsMapping,
 } from "../../utils/appwrite/appwriteConfig";
 
-import CreateRoom from "@/components/screens/CreateRoom";
 //context
 import { globalContext } from "@/context/GlobalContext";
-import JoinRoom from "@/components/screens/JoinRoom";
 
 function index({ games, ...props }) {
   const { setGames } = useContext(globalContext);
