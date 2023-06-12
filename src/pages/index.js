@@ -6,13 +6,13 @@ import {
   Stack,
   TextField,
   InputLabel,
-  Button,
   Fade,
 } from "@mui/material";
 //internal components
 import ParticleBg from "@components/particlebg";
 import CreateRoom from "@/components/screens/CreateRoom";
 import JoinRoom from "@/components/screens/JoinRoom";
+import Button from "@/components/buttons/LoadingBtn";
 //nextjs
 import { useRouter } from "next/router";
 import { useState, useContext, useEffect } from "react";
@@ -22,7 +22,7 @@ import { toast } from "react-toastify";
 import { globalContext } from "@/context/GlobalContext";
 //utils
 import { gameModeId } from "@/utils/constants";
-import { customToast, setModeId } from "@/utils/utils";
+import { setModeId } from "@/utils/utils";
 import {
   databases,
   dbIdMappings,

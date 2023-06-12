@@ -139,6 +139,10 @@ function index({ games, ...props }) {
                   return (
                     <ButtonBase
                       onClick={(e) => {
+                        const sound = new Audio(
+                          "/assests/audios/click/button_click.mp3"
+                        );
+                        sound.play();
                         handleSharpShooter(e, game);
                       }}
                       key={index}

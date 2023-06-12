@@ -81,7 +81,7 @@ function index({ ...props }) {
               setIsGettingData(false);
             })
             .catch((error) => {
-              console.error(error); // Handle any errors that occur
+              customToast(err?.message, "error");
               setIsGettingData(false);
             });
 
@@ -122,7 +122,7 @@ function index({ ...props }) {
             setIsGettingData(false);
           })
           .catch((error) => {
-            console.error(error, "ljljlkj"); // Handle any errors that occur
+            customToast(err?.message, "error");
             setIsGettingData(false);
           });
       })();

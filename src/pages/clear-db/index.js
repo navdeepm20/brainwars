@@ -1,13 +1,5 @@
 //mui
-import {
-  Paper,
-  Box,
-  Typography,
-  Stack,
-  TextField,
-  InputLabel,
-  Button,
-} from "@mui/material";
+import { Paper, Box, Typography, TextField, InputLabel } from "@mui/material";
 //internal components
 import ParticleBg from "@components/particlebg";
 //nextjs
@@ -28,9 +20,6 @@ import JoinRoom from "@/components/screens/JoinRoom";
 function index({ games, ...props }) {
   const { setGames } = useContext(globalContext);
   const [name, setName] = useState("");
-  const router = useRouter();
-  const [isCreateRoomActive, setIsCreateRoomActive] = useState(false);
-  const [isJoinRoom, setIsJoinRoom] = useState(false);
 
   useEffect(() => {
     setGames(games);

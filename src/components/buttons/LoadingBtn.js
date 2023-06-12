@@ -9,9 +9,13 @@ const LoadingButton = ({
   ...props
 }) => {
   const [buttonDisabled, setButtonDisabled] = useState(false);
-
+  const playClickSound = (e) => {
+    const sound = new Audio("/assests/audios/click/button_click.mp3");
+    sound.play();
+  };
   const handleClick = async () => {
     setButtonDisabled(true);
+    playClickSound();
     await onClick();
     setButtonDisabled(false);
   };
