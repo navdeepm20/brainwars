@@ -32,6 +32,7 @@ import Loader from "@/components/loader";
 import { globalContext } from "@/context/GlobalContext";
 //njs
 import { useRouter } from "next/router";
+import { customToast } from "@/utils/utils";
 
 const GameRoomCard = ({ ...props }) => {
   const router = useRouter();
@@ -95,7 +96,7 @@ const GameRoomCard = ({ ...props }) => {
       );
     } catch (err) {
       setIsSubmitting(false);
-      console.log(err);
+      customToast(err?.message, "error");
     }
   };
   //for timer
@@ -187,7 +188,7 @@ const GameRoomCard = ({ ...props }) => {
         );
         setCreatorInfo(creatorInfo);
       } catch (err) {
-        console.log(err);
+        customToast(err?.message, "error");
       } finally {
         setIsGettingData(false);
       }
@@ -245,7 +246,6 @@ const GameRoomCard = ({ ...props }) => {
       client.subscribe(
         `databases.${dbIdMappings.main}.collections.${collectionsMapping?.rooms}.documents.${roomData?.$id}`,
         (response) => {
-          console.log(response.payload, "payload");
           setRoomData(response?.payload);
         }
       );

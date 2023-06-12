@@ -29,7 +29,7 @@ import {
 //context
 import { globalContext } from "@/context/GlobalContext";
 //utils & helpers
-import { generateRoomCode, setModeId } from "@/utils/utils";
+import { customToast, generateRoomCode, setModeId } from "@/utils/utils";
 //utils
 import { gameModeId } from "@/utils/constants";
 import { getRandomAvatarUrl } from "@/utils/components/pickGame";
@@ -104,7 +104,7 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
         setIsCreatingRoom(false);
       } catch (err) {
         setIsCreatingRoom(false);
-        console.log(err);
+        customToast(err?.message, "error");
       }
     }
   };
@@ -195,7 +195,7 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
               setParticipants(e.target.value);
             }}
             type="number"
-            helperText="Max 10 Participants Only"
+            helperText="Number of participants including you. (Max 10)"
           />
           <Select
             fullWidth

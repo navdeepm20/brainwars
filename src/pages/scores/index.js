@@ -30,6 +30,7 @@ import { functions } from "@/utils/appwrite/appwriteConfig";
 
 //internal
 import ConfettiAnimation from "@/components/confetti";
+import { customToast } from "@/utils/utils";
 
 function index({ ...props }) {
   const router = useRouter();
@@ -61,6 +62,7 @@ function index({ ...props }) {
           //   allLinkedGameSessions,
           //   roomInfo
           // );
+          customToast("Calulating your scores", "info");
           functions
             .createExecution(
               "6485aeaf40916b78b283",
@@ -74,7 +76,6 @@ function index({ ...props }) {
               })
             )
             .then((response) => {
-              console.log(response);
               const parsedData = JSON.parse(response?.response);
               setFinalScores(parsedData?.scoreInfo); // Handle the function execution response
               setIsGettingData(false);
@@ -86,7 +87,7 @@ function index({ ...props }) {
 
           // setFinalScores(finalCalculatedScores);
         } catch (err) {
-          console.log(err);
+          customToast(err?.message, "error");
           setIsGettingData(false);
         }
       })();

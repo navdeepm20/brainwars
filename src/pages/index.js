@@ -11,23 +11,25 @@ import {
 } from "@mui/material";
 //internal components
 import ParticleBg from "@components/particlebg";
+import CreateRoom from "@/components/screens/CreateRoom";
+import JoinRoom from "@/components/screens/JoinRoom";
 //nextjs
 import { useRouter } from "next/router";
 import { useState, useContext, useEffect } from "react";
 //libs
+import { toast } from "react-toastify";
+//context
+import { globalContext } from "@/context/GlobalContext";
+//utils
+import { gameModeId } from "@/utils/constants";
+import { customToast, setModeId } from "@/utils/utils";
 import {
   databases,
   dbIdMappings,
   collectionsMapping,
 } from "../utils/appwrite/appwriteConfig";
-
-import CreateRoom from "@/components/screens/CreateRoom";
-import JoinRoom from "@/components/screens/JoinRoom";
-//context
-import { globalContext } from "@/context/GlobalContext";
-//utils
-import { gameModeId } from "@/utils/constants";
-import { setModeId } from "@/utils/utils";
+//sounds
+// import notifcationSound from "@public/assests/audios/notification/mario_coin.mp3";
 
 function index({ games, ...props }) {
   const { setGames, setMetaInfo } = useContext(globalContext);
@@ -53,6 +55,7 @@ function index({ games, ...props }) {
         isGameStarted: false,
       });
       setModeId(gameModeId?.single);
+
       router.push({
         pathname: "/pick-game",
         query: { name },

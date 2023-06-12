@@ -96,3 +96,16 @@ a {
     color-scheme: dark;
   }
 }
+
+.glassmorphism-toast {
+  background-color: rgba(77, 72, 72, 0.25) !important;
+  backdrop-filter: blur(4px) !important;
+  border-radius: 4px !important;
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  color: #fff !important;
+}
+
+.glassmorphism-toast-body {
+  font-weight: bold !important;
+}

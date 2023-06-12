@@ -18,7 +18,7 @@ import { globalContext } from "@/context/GlobalContext";
 //react
 import { useContext } from "react";
 import { useState } from "react";
-import { getModeId } from "@/utils/utils";
+import { customToast, getModeId } from "@/utils/utils";
 import { getRandomAvatarUrl } from "@/utils/components/pickGame";
 
 function index({ games, ...props }) {
@@ -79,12 +79,11 @@ function index({ games, ...props }) {
           })
           .catch((err) => {
             setIsSubmitting(false);
-            alert(err.message);
-            console.log(err);
+            customToast(err?.message, "error");
           });
       }
     } else {
-      alert("mode id not found");
+      customToast("Mode Id not Found. Please restart the game", "error");
     }
   };
 

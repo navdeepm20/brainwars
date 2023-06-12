@@ -26,7 +26,7 @@ import { globalContext } from "@/context/GlobalContext";
 import LoadingButton from "../buttons/LoadingBtn";
 //utils
 import { gameModeId } from "@/utils/constants";
-import { setModeId } from "@/utils/utils";
+import { customToast, setModeId } from "@/utils/utils";
 import { getRandomAvatarUrl } from "@/utils/components/pickGame";
 
 function JoinRoom({ goBackHandler, ...props }) {
@@ -52,7 +52,7 @@ function JoinRoom({ goBackHandler, ...props }) {
         response?.documents[0]?.players?.length >=
           response?.documents[0]?.maxParticipants - 1
       ) {
-        alert("Room is full");
+        customToast("Oops..., Room is full", "error");
       } else {
         const avatarUrl = await getRandomAvatarUrl();
         //create user
@@ -111,7 +111,7 @@ function JoinRoom({ goBackHandler, ...props }) {
       setIsJoiningRoom(false);
     } catch (err) {
       setIsJoiningRoom(false);
-      console.log(err);
+      customToast(err?.message, "error");
     }
   };
 

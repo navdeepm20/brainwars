@@ -19,7 +19,7 @@ import {
 } from "@/utils/appwrite/appwriteConfig";
 import { useRouter } from "next/router";
 import { calculateScores } from "@/utils/components/sharpShooter.js";
-import { getModeId } from "@/utils/utils";
+import { customToast, getModeId } from "@/utils/utils";
 import { gameModeId } from "@/utils/constants";
 //These are effective constants. You can direct tweak things from here.
 const MIN = 1;
@@ -75,7 +75,7 @@ function index({ ...props }) {
     client.subscribe(
       `databases.${dbIdMappings.main}.collections.${collectionsMapping?.game_session}.documents`,
       (response) => {
-        console.log(response.payload);
+        // console.log(response.payload);
       }
     );
 
@@ -172,13 +172,12 @@ function index({ ...props }) {
           }, 5000);
         })
         .catch((err) => {
-          console.log(err);
+          customToast(err?.message, "error");
         });
     }
   }, [shootsLeft, lifeLines, scores]);
 
   useEffect(() => {
-    console.log(intervalId, scoresRedirectTimer);
     if (intervalId && scoresRedirectTimer === 0) {
       clearInterval(intervalId);
       if (modeId) {
@@ -197,7 +196,7 @@ function index({ ...props }) {
             },
           });
       } else {
-        alert("mode not found");
+        customToast("Oops.. Mode not Found. Please restart the game");
       }
     }
   }, [intervalId, scoresRedirectTimer]);
@@ -232,7 +231,7 @@ function index({ ...props }) {
         });
       })
       .catch((err) => {
-        console.log(err);
+        customToast(err?.message, "error");
       });
   }
 

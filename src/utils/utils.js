@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 export const generateRoomCode = (codeLength = 6) => {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -9,6 +11,54 @@ export const generateRoomCode = (codeLength = 6) => {
   }
 
   return roomCode;
+};
+
+// export const customToast = (message, (options = {}))=>toast.;
+
+export const customToast = (message, type, options = {}) => {
+  switch (type) {
+    case "success":
+      return toast.success(message, {
+        onOpen: () => {
+          const audio = new Audio("/assests/audios/notification/simple.mp3");
+          audio.play();
+        },
+        ...options,
+      });
+    case "error":
+      return toast.error(message, {
+        onOpen: () => {
+          const audio = new Audio("/assests/audios/notification/simple.mp3");
+          audio.play();
+        },
+        ...options,
+      });
+    case "info":
+      return toast.info(message, {
+        onOpen: () => {
+          const audio = new Audio("/assests/audios/notification/simple.mp3");
+          audio.play();
+        },
+        ...options,
+      });
+    case "warning":
+      return toast.warning(message, {
+        onOpen: () => {
+          const audio = new Audio("/assests/audios/notification/simple.mp3");
+          audio.play();
+        },
+        ...options,
+      });
+
+    default:
+      return toast.info(message, {
+        onOpen: () => {
+          const audio = new Audio("/assests/audios/notification/simple.mp3");
+          audio.play();
+        },
+        ...options,
+      });
+  }
 };
 
 export const getModeId = () => sessionStorage.getItem("mid");
