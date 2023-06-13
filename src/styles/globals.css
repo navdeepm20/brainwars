@@ -104,8 +104,10 @@ a {
   border: none !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
   color: #fff !important;
+  font-family: "Inter", sans-serif;
 }
 
 .glassmorphism-toast-body {
-  font-weight: bold !important;
+  font-family: "Inter", sans-serif !important;
+  font-weight: 500 !important;
 }

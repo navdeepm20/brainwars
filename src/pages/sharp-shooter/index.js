@@ -72,17 +72,28 @@ function index({ ...props }) {
       setShootsLeft((prev) => prev - 1);
     }
     setModeId(getModeId());
-    client.subscribe(
-      `databases.${dbIdMappings.main}.collections.${collectionsMapping?.game_session}.documents`,
-      (response) => {
-        // console.log(response.payload);
-      }
-    );
 
     return () => {
       isMounted.current = true;
     };
   }, []);
+  useEffect(() => {
+    if (gameSessionId)
+      (async () => {
+        try {
+          await databases.updateDocument(
+            dbIdMappings?.main,
+            collectionsMapping?.game_session,
+            gameSessionId,
+            {
+              status: "InProgress",
+            }
+          );
+        } catch (err) {
+          customToast(err.message, "error");
+        }
+      })();
+  }, [gameSessionId]);
 
   //for showing the start timer
   useEffect(() => {
@@ -186,6 +197,7 @@ function index({ ...props }) {
             pathname: "/scores",
             query: {
               rid: roomId,
+              gsid: gameSessionId,
             },
           });
         else

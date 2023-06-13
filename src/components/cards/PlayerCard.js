@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { Stack, Typography, alpha } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
+import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 //libs
 // Dynamically import Avatar component to make it compatible with SSR
 // const Avatar = dynamic(() => import("react-nice-avatar"), { ssr: false });
@@ -20,7 +21,7 @@ const PlayerCard = ({
   opacity,
   isWinner,
   score,
-
+  isPlaying,
   sx,
   ...props
 }) => {
@@ -34,12 +35,15 @@ const PlayerCard = ({
         border: "1px solid #333",
         p: "1rem 1.2rem",
         borderRadius: "1rem",
-        backgroundColor: (theme) => alpha(theme.palette.primary.main, opacity),
+        backgroundColor: (theme) => {
+          if (isPlaying) return alpha(theme.palette.primary.main, opacity);
+          return alpha(theme.palette.info.main, opacity);
+        },
         cursor: "pointer",
         ...sx,
       }}
       direction="row"
-      title={isCreator ? "Room Admin" : "Player"}
+      title={isPlaying ? "In Game" : isCreator ? "Room Admin" : "Player"}
       {...props}
     >
       {/* <Avatar
@@ -59,6 +63,19 @@ const PlayerCard = ({
         {isCreator && (
           <span title="Room Admin">
             <StarIcon
+              sx={{
+                fontSize: 16,
+                color: "yellow",
+                ml: ".5rem",
+                mt: ".5rem",
+                cursor: "pointer",
+              }}
+            />
+          </span>
+        )}
+        {isPlaying && (
+          <span title="Playing">
+            <SportsEsportsIcon
               sx={{
                 fontSize: 16,
                 color: "yellow",
@@ -103,5 +120,6 @@ PlayerCard.defaultProps = {
   name: "",
   isCreator: false,
   avatarUrl: "",
+  isPlaying: false,
 };
 export default PlayerCard;

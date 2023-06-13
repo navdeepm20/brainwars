@@ -46,7 +46,10 @@ function JoinRoom({ goBackHandler, ...props }) {
         collectionsMapping.rooms,
         [Query.equal("roomCode", [`${roomCode}`])]
       );
-
+      if (response?.documents[0]?.status?.toLowerCase() === "inprogress") {
+        setIsJoiningRoom(false);
+        return customToast("Oops.., Game is already started.", "warning");
+      }
       if (
         response?.total &&
         response?.documents[0]?.players?.length >=

@@ -91,7 +91,7 @@ function index({ games, ...props }) {
               sx={{ color: "customTheme.text" }}
               align="center"
             >
-              Welcome to MathWars
+              Welcome to Brainwars
             </Typography>
             <Typography
               variant="subtitle1"
@@ -109,7 +109,6 @@ function index({ games, ...props }) {
               value={name}
               onChange={handleNameChange}
             />
-
             <Button
               variant="contained"
               fullWidth

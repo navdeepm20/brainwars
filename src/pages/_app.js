@@ -29,7 +29,7 @@ export default function App({
             <GlobalLayout>
               <ToastContainer
                 position="top-right"
-                autoClose={500000}
+                autoClose={5000}
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick

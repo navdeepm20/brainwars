@@ -47,6 +47,7 @@ const GameRoomCard = ({ ...props }) => {
   const [startTimer, setStartTimer] = useState(false);
   const [roomId, setRoomId] = useState("");
   const [timeoutTime, setTimeoutTime] = useState(10);
+  const [isGameAlreadyStarted, setIsGameAlreadyStarted] = useState(false);
 
   //handlers
   const handleStartGame = async (e) => {
@@ -113,7 +114,7 @@ const GameRoomCard = ({ ...props }) => {
   //start game
   const startGame = async () => {
     await handleStartGame();
-    startGameTimer();
+    !isGameAlreadyStarted && startGameTimer();
   };
 
   //for clear interval
@@ -128,6 +129,7 @@ const GameRoomCard = ({ ...props }) => {
     (async () => {
       if (timeoutTime === 0) {
         clearInterval(timerId);
+
         if (roomData?.gameSessions?.length) {
           const gameSessions = roomData?.gameSessions || [];
 
@@ -155,6 +157,8 @@ const GameRoomCard = ({ ...props }) => {
               },
             });
           }
+        } else {
+          customToast("Game Session not found", "error");
         }
       }
     })();
@@ -169,15 +173,20 @@ const GameRoomCard = ({ ...props }) => {
           collectionsMapping.rooms,
           router?.asPath.split("lobby/")[1]
         );
-        setRoomData(roomInfo);
-        setRoomId(roomInfo?.$id);
-
-        //get the game info
         const gameInfo = await databases.getDocument(
           dbIdMappings.main,
           collectionsMapping.games,
           roomInfo.gameId
         );
+        if (roomInfo?.status.toLowerCase() === "inprogress") {
+          customToast("Oops..Game already started.", "warning");
+          setIsGameAlreadyStarted(true);
+        }
+        setRoomData(roomInfo);
+        setRoomId(roomInfo?.$id);
+
+        //get the game info
+
         setGameInfo(gameInfo);
 
         //get the creator info
@@ -220,7 +229,10 @@ const GameRoomCard = ({ ...props }) => {
 
   //for getting the players info
   useEffect(() => {
-    if (roomData?.status?.toLowerCase() === "inprogress") {
+    if (
+      roomData?.status?.toLowerCase() === "inprogress" &&
+      !isGameAlreadyStarted
+    ) {
       startGameTimer();
     }
     (async () => {
@@ -365,9 +377,15 @@ const GameRoomCard = ({ ...props }) => {
               sx={{ m: "auto", display: "block", mt: 3, color: "success.main" }}
               disabled={user?.id !== roomData?.creatorId || isSubmitting}
               title="Only creator can start the game"
-              onClick={startGame}
+              onClick={
+                !isGameAlreadyStarted && user?.id === roomData?.creatorId
+                  ? startGame
+                  : () => {
+                      router.push("/");
+                    }
+              }
             >
-              Start Game
+              {!isGameAlreadyStarted ? "Start Game" : "Go Back"}
             </Btn1>
             {startTimer && (
               <Typography align="center" sx={{ color: "customTheme.text2" }}>

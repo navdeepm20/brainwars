@@ -3,7 +3,7 @@
 import { Card, CardContent, Stack, Typography, alpha } from "@mui/material";
 
 //react
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 //internal
 import GameCard from "@/components/cards/GameCard";
 import Btn1 from "@/components/buttons/Btn1";
@@ -19,79 +19,100 @@ import {
   fetchRoomInfo,
   fetchGameSessionsInfo,
   fetchScoresInfo,
-  calculateMultiPlayerScores,
-  calculateSinglePlayerScores,
   getScore,
   getPlayerInfo,
   getGameSession,
 } from "@/utils/components/scores";
 
-import { functions } from "@/utils/appwrite/appwriteConfig";
+import {
+  functions,
+  databases,
+  dbIdMappings,
+  collectionsMapping,
+  client,
+} from "@/utils/appwrite/appwriteConfig";
 
 //internal
 import ConfettiAnimation from "@/components/confetti";
-import { customToast } from "@/utils/utils";
+import { customToast, getModeId } from "@/utils/utils";
+import { gameModeId } from "@/utils/constants";
 
 function index({ ...props }) {
   const router = useRouter();
+
   const { rid: roomId, gsid: gameSessionId } = router.query;
   const [gameInfo, setGameInfo] = useState({});
   const [isGettingData, setIsGettingData] = useState(true);
   const [finalScores, setFinalScores] = useState(null);
+  const [roomInfo, setRoomInfo] = useState(null);
+  const [gameSessionsInfo, setGameSessionsInfo] = useState([]);
+  const [isScoreCalculated, setIsScoreCalculated] = useState(false);
 
   useEffect(() => {
-    if (roomId) {
+    //update the session status to completed
+    if (gameSessionId) {
+      (async () => {
+        try {
+          await databases.updateDocument(
+            dbIdMappings?.main,
+            collectionsMapping?.game_session,
+            gameSessionId,
+            {
+              status: "Completed",
+            }
+          );
+        } catch (err) {
+          customToast(err.message, "error");
+        }
+      })();
+    } else {
+      // customToast("Game session not found", "error");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (getModeId() === gameModeId?.multi && roomId) {
       (async () => {
         try {
           setIsGettingData(true);
           const roomInfo = await fetchRoomInfo(roomId);
+          setRoomInfo(roomInfo);
 
           const allLinkedGameSessions = await fetchGameSessionsInfo(
             roomInfo?.gameSessions
           );
 
+          if (allLinkedGameSessions?.length) {
+            const InProgressSession = allLinkedGameSessions?.find((session) => {
+              return session?.data?.status?.toLowerCase() === "inprogress";
+            });
+            if (InProgressSession) {
+              customToast("Few Players are still playing. Please Wait", "info");
+            }
+          }
+
+          const allGameSessionsLinked = await Promise.all(
+            allLinkedGameSessions?.map(async (session) => {
+              const playerInfo = await getPlayerInfo(session?.creatorId);
+              return {
+                id: session?.$id,
+                avatarUrl: playerInfo?.avatarUrl,
+                data: session,
+              };
+            })
+          );
+          setGameSessionsInfo(allGameSessionsLinked);
+
           const gameInfo = await fetchGameInfo(roomInfo?.gameId);
           setGameInfo(gameInfo);
 
-          const allLinkedPlayersScores = await fetchScoresInfo(
-            allLinkedGameSessions
-          );
-
-          // const finalCalculatedScores = calculateMultiPlayerScores(
-          //   allLinkedPlayersScores,
-          //   allLinkedGameSessions,
-          //   roomInfo
-          // );
-          customToast("Calulating your scores", "info");
-          functions
-            .createExecution(
-              "6485aeaf40916b78b283",
-              JSON.stringify({
-                mode: "multi",
-                data: {
-                  allLinkedPlayersScores,
-                  allLinkedGameSessions,
-                  roomInfo,
-                },
-              })
-            )
-            .then((response) => {
-              const parsedData = JSON.parse(response?.response);
-              setFinalScores(parsedData?.scoreInfo); // Handle the function execution response
-              setIsGettingData(false);
-            })
-            .catch((error) => {
-              customToast(err?.message, "error");
-              setIsGettingData(false);
-            });
-
-          // setFinalScores(finalCalculatedScores);
+          setIsGettingData(false);
         } catch (err) {
           customToast(err?.message, "error");
           setIsGettingData(false);
         }
       })();
-    } else if (gameSessionId) {
+    } else if (getModeId() === gameModeId?.single && !roomId) {
       (async () => {
         const scoresInfo = await getScore(gameSessionId);
         const gameSessionInfo = await getGameSession(gameSessionId);
@@ -126,12 +147,83 @@ function index({ ...props }) {
             setIsGettingData(false);
           });
       })();
+    } else {
+      // customToast("Something went wrong. Please reload or try again.", "error");
     }
   }, [router]);
+
+  useEffect(() => {
+    if (roomInfo?.gameSessions?.length) {
+      roomInfo?.gameSessions?.forEach((element) => {
+        client.subscribe(
+          `databases.${dbIdMappings.main}.collections.${collectionsMapping?.game_session}.documents.${element}`,
+          (response) => {
+            setGameSessionsInfo((prev) => {
+              const sessions = prev.map((session) => {
+                if (session?.id === element) {
+                  return { ...session, data: response.payload };
+                }
+                return session;
+              });
+
+              return sessions;
+            });
+          }
+        );
+      });
+    }
+  }, [roomInfo]);
+
+  useEffect(() => {
+    if (gameSessionsInfo?.length) {
+      if (
+        !gameSessionsInfo?.find(
+          (session) => session.data?.status?.toLowerCase() === "inprogress"
+        )
+      ) {
+        customToast("Calulating your scores", "info");
+        (async () => {
+          const allLinkedGameSessions = await fetchGameSessionsInfo(
+            roomInfo?.gameSessions
+          );
+          const allLinkedPlayersScores = await fetchScoresInfo(
+            allLinkedGameSessions
+          );
+
+          functions
+            .createExecution(
+              "6485aeaf40916b78b283",
+              JSON.stringify({
+                mode: "multi",
+                data: {
+                  allLinkedPlayersScores,
+                  allLinkedGameSessions,
+                  roomInfo,
+                },
+              })
+            )
+            .then((response) => {
+              const parsedData = JSON.parse(response?.response);
+              setFinalScores(parsedData?.scoreInfo); // Handle the function execution response
+              setIsGettingData(false);
+              setIsScoreCalculated(true);
+              customToast("Scores Calculated", "success");
+            })
+            .catch((error) => {
+              customToast(error?.message, "error");
+              setIsGettingData(false);
+            });
+        })();
+      } else {
+        // customToast("Some players are still playing", "info");
+      }
+    }
+  }, [gameSessionsInfo]);
+
   return (
     <>
       <ParticlesBg />
-      {!isGettingData && <ConfettiAnimation />}
+      {isScoreCalculated && <ConfettiAnimation />}
       <Card
         sx={{
           border: "1px solid #333",
@@ -164,18 +256,37 @@ function index({ ...props }) {
 
             <GameCard gameInfo={gameInfo} />
             <Stack rowGap={2} mt={4}>
-              {finalScores?.map((score, index) => {
-                return (
-                  <PlayerCard
-                    avatarUrl={score?.avatarUrl}
-                    name={score?.playerName}
-                    key={index}
-                    isCreator={score?.isCreator}
-                    isWinner={index === 0}
-                    score={score?.score}
-                  />
-                );
-              })}
+              {!finalScores?.length
+                ? gameSessionsInfo?.map((session, index) => {
+                    return (
+                      <PlayerCard
+                        avatarUrl={session?.avatarUrl}
+                        name={session?.data?.creatorName}
+                        key={index}
+                        isCreator={
+                          session?.data?.creatorId === roomInfo?.creatorId
+                        }
+                        // isWinner={index === 0}
+                        score={session?.data?.score}
+                        isPlaying={
+                          session?.data?.status?.toLowerCase() === "inprogress"
+                        }
+                      />
+                    );
+                  })
+                : finalScores?.map((score, index) => {
+                    return (
+                      <PlayerCard
+                        avatarUrl={score?.avatarUrl}
+                        name={score?.playerName}
+                        key={index}
+                        isCreator={score?.playerId === roomInfo?.creatorId}
+                        isWinner={index === 0}
+                        score={score?.score}
+                        isPlaying={false}
+                      />
+                    );
+                  })}
             </Stack>
 
             <Btn1
