@@ -9,6 +9,7 @@ function GlobalLayout({ children, ...props }) {
       sx={{
         height: "100vh",
         display: "flex",
+        my: "4rem",
         justifyContent: "center",
         alignItems: "center",
         background: "transparent",
