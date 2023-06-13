@@ -7,9 +7,8 @@ function GlobalLayout({ children, ...props }) {
     <Container
       maxWidth="sm"
       sx={{
-        height: "100vh",
+        height: "100dvh",
         display: "flex",
-        my: "4rem",
         justifyContent: "center",
         alignItems: "center",
         background: "transparent",

@@ -48,6 +48,11 @@ function index({ ...props }) {
   const [gameSessionsInfo, setGameSessionsInfo] = useState([]);
   const [isScoreCalculated, setIsScoreCalculated] = useState(false);
 
+  const playVictorySound = () => {
+    const audio = new Audio("/assests/audios/victory/victory.mp3");
+    audio.play();
+  };
+
   useEffect(() => {
     //update the session status to completed
     if (gameSessionId) {
@@ -71,7 +76,7 @@ function index({ ...props }) {
   }, []);
 
   useEffect(() => {
-    if (getModeId() === gameModeId?.multi && roomId) {
+    if (getModeId() === gameModeId?.multi && roomId && gameSessionId) {
       (async () => {
         try {
           setIsGettingData(true);
@@ -112,7 +117,7 @@ function index({ ...props }) {
           setIsGettingData(false);
         }
       })();
-    } else if (getModeId() === gameModeId?.single && !roomId) {
+    } else if (getModeId() === gameModeId?.single && !roomId && gameSessionId) {
       (async () => {
         const scoresInfo = await getScore(gameSessionId);
         const gameSessionInfo = await getGameSession(gameSessionId);
@@ -141,9 +146,12 @@ function index({ ...props }) {
             const parsedData = JSON.parse(response?.response);
             setFinalScores(parsedData?.scoreInfo); // Handle the function execution response
             setIsGettingData(false);
+            setIsScoreCalculated(true);
+            customToast("Scores Calculated", "success");
+            playVictorySound();
           })
           .catch((error) => {
-            customToast(err?.message, "error");
+            customToast(error?.message, "error");
             setIsGettingData(false);
           });
       })();
@@ -207,6 +215,7 @@ function index({ ...props }) {
               setFinalScores(parsedData?.scoreInfo); // Handle the function execution response
               setIsGettingData(false);
               setIsScoreCalculated(true);
+              playVictorySound();
               customToast("Scores Calculated", "success");
             })
             .catch((error) => {
