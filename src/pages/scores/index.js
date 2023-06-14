@@ -242,7 +242,8 @@ function index({ ...props }) {
         sx={{
           border: "1px solid #333",
           borderRadius: "8px",
-          minWidth: "60rem",
+          minWidth: "35rem",
+          width: "100%",
           maxWidth: "60rem",
           background: " rgba( 77, 72, 72, 0.25 )",
           boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
