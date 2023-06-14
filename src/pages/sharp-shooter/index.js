@@ -1,7 +1,9 @@
 //react
 import { useState, useEffect, useRef } from "react";
 //mui
-import { Paper, Typography, Stack, Box } from "@mui/material";
+import { Paper, Typography, Stack, Box, IconButton } from "@mui/material";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 //internal components
 import Btn1 from "@/components/buttons/Btn1";
 import ParticleBg from "@components/particlebg";
@@ -61,11 +63,31 @@ function index({ ...props }) {
     msg: "",
   });
 
+  const [shouldPlayTheme, setShouldPlayTheme] = useState(true);
+  const audioRef = useRef();
+
   //ctx
   // const { currentGame } = useContext(globalContext);
 
   const [lifeLines, setLifeLines] = useState(MAX_LIFE_LINES);
   const isMounted = useRef(false);
+
+  //for game music
+  const handleAudioPlayBack = () => {
+    setShouldPlayTheme((prev) => {
+      if (prev) {
+        audioRef?.current?.pause();
+      } else {
+        audioRef?.current?.play();
+      }
+      return !prev;
+    });
+  };
+
+  useEffect(() => {
+    const countdownAudio = new Audio("/assests/audios/countdown/countdown.mp3");
+    countdownAudio.play();
+  }, []);
 
   //adding realtime updates
   useEffect(() => {
@@ -227,7 +249,8 @@ function index({ ...props }) {
       promise
         .then((response) => {
           if (modeId) {
-            if (modeId === gameModeId?.multi)
+            if (modeId === gameModeId?.multi) {
+              handleAudioPlayBack();
               router.push({
                 pathname: "/scores",
                 query: {
@@ -235,13 +258,15 @@ function index({ ...props }) {
                   gsid: gameSessionId,
                 },
               });
-            else
+            } else {
+              handleAudioPlayBack();
               router.push({
                 pathname: "/scores",
                 query: {
                   gsid: gameSessionId,
                 },
               });
+            }
           } else {
             customToast("Oops.. Mode not Found. Please restart the game");
           }
@@ -409,6 +434,13 @@ function index({ ...props }) {
           <Timer />
         ) : (
           <>
+            <IconButton onClick={handleAudioPlayBack} sx={{ mb: 2 }}>
+              {shouldPlayTheme ? (
+                <VolumeUpIcon titleAccess="Click Stop Audio" />
+              ) : (
+                <VolumeOffIcon title="Click Play Audio" />
+              )}
+            </IconButton>
             {shootsLeft >= 0 && lifeLines > 0 ? (
               <Typography variant="button" sx={{ color: "success.main" }}>
                 Life: {lifeLines}❤️
@@ -567,6 +599,12 @@ function index({ ...props }) {
             </>
           </>
         )}
+        <audio
+          src="/assests/audios/game/music.mp3"
+          ref={audioRef}
+          autoPlay={shouldPlayTheme}
+          loop={true}
+        ></audio>
       </Paper>
     </Box>
   );
