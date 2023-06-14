@@ -126,7 +126,11 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
       >
         <IconButton
           sx={{ justifyContent: "flex-start", alignSelf: "flex-start" }}
-          onClick={goBackHandler}
+          onClick={() => {
+            const sound = new Audio("/assests/audios/click/button_click.mp3");
+            sound.play();
+            goBackHandler();
+          }}
         >
           <ArrowBackIcon />
         </IconButton>

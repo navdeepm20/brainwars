@@ -36,6 +36,7 @@ function index({ ...props }) {
   const [modeId, setModeId] = useState();
 
   // const [gameSessionInfo, setGameSessionInfo] = useState(null);
+
   const [showTimer, setShowTimer] = useState(true);
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(null);
@@ -47,6 +48,7 @@ function index({ ...props }) {
   const [intervalId, setIntervalId] = useState(null);
   const [scoresRedirectTimer, setScoresRedirectTimer] = useState(5);
   const isAlreadySubmittedRef = useRef(false);
+  const [gameTimer, setGameTimer] = useState(1);
   const [scores, setScores] = useState({
     right: 0,
     wrong: 0,
@@ -100,11 +102,33 @@ function index({ ...props }) {
     const timeoutId = setTimeout(() => {
       setShowTimer(false);
     }, 4000);
+
     return () => {
-      clearInterval(timeoutId);
+      clearTimeout(timeoutId);
     };
   }, []);
 
+  useEffect(() => {
+    let globalGameTimerId;
+    if (showTimer === false) {
+      globalGameTimerId = setInterval(() => {
+        setGameTimer((prev) => prev + 1);
+      }, 1000);
+    }
+    return () => {
+      clearInterval(globalGameTimerId);
+    };
+  }, [showTimer]);
+  const hours = Math.floor(gameTimer / 3600);
+  const minutes = Math.floor((gameTimer % 3600) / 60);
+  const seconds = gameTimer % 60;
+
+  const formattedTime = `${String(hours).padStart(2, "0")}:${String(
+    minutes
+  ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+  // const minutes = Math.floor(gameTimer / 60);
+  // const seconds = gameTimer % 60;
   //abort game if shoots lefts < 0 || lifeLines === 0 (Calculate scores as well)
 
   useEffect(() => {
@@ -191,25 +215,40 @@ function index({ ...props }) {
   useEffect(() => {
     if (intervalId && scoresRedirectTimer === 0) {
       clearInterval(intervalId);
-      if (modeId) {
-        if (modeId === gameModeId?.multi)
-          router.push({
-            pathname: "/scores",
-            query: {
-              rid: roomId,
-              gsid: gameSessionId,
-            },
-          });
-        else
-          router.push({
-            pathname: "/scores",
-            query: {
-              gsid: gameSessionId,
-            },
-          });
-      } else {
-        customToast("Oops.. Mode not Found. Please restart the game");
-      }
+
+      const promise = databases.updateDocument(
+        dbIdMappings.main,
+        collectionsMapping.game_session,
+        gameSessionId,
+        {
+          timeElapsed: gameTimer,
+        }
+      );
+      promise
+        .then((response) => {
+          if (modeId) {
+            if (modeId === gameModeId?.multi)
+              router.push({
+                pathname: "/scores",
+                query: {
+                  rid: roomId,
+                  gsid: gameSessionId,
+                },
+              });
+            else
+              router.push({
+                pathname: "/scores",
+                query: {
+                  gsid: gameSessionId,
+                },
+              });
+          } else {
+            customToast("Oops.. Mode not Found. Please restart the game");
+          }
+        })
+        .catch((err) => {
+          customToast(err?.message, "error");
+        });
     }
   }, [intervalId, scoresRedirectTimer]);
   //send data in realtime to server
@@ -233,6 +272,7 @@ function index({ ...props }) {
               : 0
             : lifeLines,
           nextDelay: NEXT_QUESTION_DELAY,
+          timeElapsed: gameTimer,
         }),
       }
     );
@@ -393,11 +433,20 @@ function index({ ...props }) {
                     sx={{ color: "customTheme.text2" }}
                     align="center"
                   >
-                    Let's Roll
+                    Let's Go
                   </Typography>
                 </>
               ) : (
                 <></>
+              )}
+              {shootsLeft > -1 && lifeLines > 0 && (
+                <Typography
+                  component="p"
+                  mt={2}
+                  sx={{ color: "customTheme.text2" }}
+                >
+                  Time Elapsed: {formattedTime}
+                </Typography>
               )}
 
               {shootsLeft >= 0 ? (

@@ -46,17 +46,20 @@ function JoinRoom({ goBackHandler, ...props }) {
         collectionsMapping.rooms,
         [Query.equal("roomCode", [`${roomCode}`])]
       );
-      if (response?.documents[0]?.status?.toLowerCase() === "inprogress") {
+      if (
+        response?.total > 0 &&
+        response?.documents[0]?.status?.toLowerCase() === "inprogress"
+      ) {
         setIsJoiningRoom(false);
         return customToast("Oops.., Game is already started.", "warning");
       }
       if (
-        response?.total &&
+        response?.total > 0 &&
         response?.documents[0]?.players?.length >=
           response?.documents[0]?.maxParticipants - 1
       ) {
         customToast("Oops..., Room is full", "error");
-      } else {
+      } else if (response?.total > 0) {
         const avatarUrl = await getRandomAvatarUrl();
         //create user
         const userResponse = await databases.createDocument(
@@ -109,11 +112,14 @@ function JoinRoom({ goBackHandler, ...props }) {
           pathname: "/lobby/[lobbyId]",
           query: { lobbyId: `${response?.documents[0]?.$id}` },
         });
+      } else {
+        customToast("Room not found or invalid room code", "error");
       }
 
       setIsJoiningRoom(false);
     } catch (err) {
       setIsJoiningRoom(false);
+      console.log(err);
       customToast(err?.message, "error");
     }
   };
@@ -132,7 +138,11 @@ function JoinRoom({ goBackHandler, ...props }) {
       >
         <IconButton
           sx={{ justifyContent: "flex-start", alignSelf: "flex-start" }}
-          onClick={goBackHandler}
+          onClick={() => {
+            const sound = new Audio("/assests/audios/click/button_click.mp3");
+            sound.play();
+            goBackHandler();
+          }}
         >
           <ArrowBackIcon />
         </IconButton>

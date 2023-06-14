@@ -121,6 +121,7 @@ function index({ ...props }) {
       (async () => {
         const scoresInfo = await getScore(gameSessionId);
         const gameSessionInfo = await getGameSession(gameSessionId);
+
         const gameInfo = await fetchGameInfo(gameSessionInfo?.gameId);
         setGameInfo(gameInfo);
         const playerInfo = await getPlayerInfo(gameSessionInfo?.creatorId);
@@ -131,6 +132,7 @@ function index({ ...props }) {
         // setFinalScores(finalCalculatedScores);
 
         //cloud function to calculate the scores.
+
         functions
           .createExecution(
             "6485aeaf40916b78b283",
@@ -139,11 +141,13 @@ function index({ ...props }) {
               data: {
                 score: scoresInfo?.documents[0]?.score,
                 playerInfo,
+                time: gameSessionInfo?.timeElapsed,
               },
             })
           )
           .then((response) => {
             const parsedData = JSON.parse(response?.response);
+
             setFinalScores(parsedData?.scoreInfo); // Handle the function execution response
             setIsGettingData(false);
             setIsScoreCalculated(true);
@@ -212,6 +216,7 @@ function index({ ...props }) {
             )
             .then((response) => {
               const parsedData = JSON.parse(response?.response);
+
               setFinalScores(parsedData?.scoreInfo); // Handle the function execution response
               setIsGettingData(false);
               setIsScoreCalculated(true);
@@ -291,7 +296,7 @@ function index({ ...props }) {
                         key={index}
                         isCreator={score?.playerId === roomInfo?.creatorId}
                         isWinner={index === 0}
-                        score={score?.score}
+                        score={score?.finalScore}
                         isPlaying={false}
                       />
                     );

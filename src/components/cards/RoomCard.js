@@ -173,6 +173,12 @@ const GameRoomCard = ({ ...props }) => {
           collectionsMapping.rooms,
           router?.asPath.split("lobby/")[1]
         );
+        if (roomInfo?.status?.toLowerCase() === "completed") {
+          return customToast(
+            "Game already completed. Please create or join a new room",
+            "warning"
+          );
+        }
         const gameInfo = await databases.getDocument(
           dbIdMappings.main,
           collectionsMapping.games,
