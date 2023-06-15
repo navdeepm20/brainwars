@@ -91,7 +91,7 @@ function index({ games, ...props }) {
               sx={{ color: "customTheme.text" }}
               align="center"
             >
-              Welcome to Brainwars
+              Welcome to BrainGames
             </Typography>
             <Typography
               variant="subtitle1"

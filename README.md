@@ -6,11 +6,13 @@ First, run the development server:
 
 ```bash
 npm run dev
-# or
+# orhttps://brainwars.vercel.app/
 yarn dev
 # or
 pnpm dev
 ```
+
+Live Project Link - [BrainGames](https://brainwars.vercel.app/)
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
