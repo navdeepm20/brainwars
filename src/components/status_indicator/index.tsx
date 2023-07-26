@@ -1,5 +1,9 @@
 import { Box } from "@mui/material";
 
+interface propTypes {
+  color?: string;
+  [props: string]: any;
+}
 function index({ color, ...props }) {
   return (
     <Box

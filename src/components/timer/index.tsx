@@ -5,10 +5,16 @@ import { Typography, Box } from "@mui/material";
 //css
 import styles from "./index.module.css";
 import { useEffect, useState } from "react";
-function index({ maxCountDown, text, ...props }) {
+
+interface timerProps {
+  maxCountDown?: number;
+  text?: string;
+  [props: string]: any;
+}
+function index({ maxCountDown, text, ...props }: timerProps) {
   const [displayText, setDisplayText] = useState(text[0] || "");
   const [time, setTime] = useState(maxCountDown);
-  const countIndex = useRef(1);
+  const countIndex = useRef<number | null>(1);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -16,7 +22,7 @@ function index({ maxCountDown, text, ...props }) {
       setTime((prev) => (prev == -1 ? -1 : prev - 1));
       countIndex.current += 1;
     }, 1000);
-    if (countIndex > maxCountDown) clearInterval(intervalId);
+    if (countIndex?.current > maxCountDown) clearInterval(intervalId);
 
     return () => clearInterval(intervalId);
   }, []);

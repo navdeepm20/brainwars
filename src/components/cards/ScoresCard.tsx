@@ -1,7 +1,23 @@
 //mui
 import { Box, Typography, Stack } from "@mui/material";
 
-function ScoreCard({ completed, scores, life, timer, ...props }) {
+interface scoreCardProps {
+  completed?: boolean;
+  scores: {
+    right: number;
+    wrong: number;
+  };
+  life: number;
+  timer: number;
+  [props: string]: any;
+}
+function ScoreCard({
+  completed,
+  scores,
+  life,
+  timer,
+  ...props
+}: scoreCardProps) {
   return (
     <>
       {completed ? (
@@ -9,13 +25,13 @@ function ScoreCard({ completed, scores, life, timer, ...props }) {
           <Stack direction="row" spacing={2}>
             <Typography sx={{ color: "success.main" }}>
               Right Answers:{" "}
-              <Typography variant="span" sx={{ color: "success.main" }}>
+              <Typography component="span" sx={{ color: "success.main" }}>
                 {scores?.right}
               </Typography>{" "}
             </Typography>
             <Typography sx={{ color: "error.main" }}>
               Wrong Answers:{" "}
-              <Typography variant="span" sx={{ color: "error.main" }}>
+              <Typography component="span" sx={{ color: "error.main" }}>
                 {scores?.wrong}
               </Typography>
             </Typography>
@@ -43,13 +59,13 @@ function ScoreCard({ completed, scores, life, timer, ...props }) {
           <Stack direction="row" spacing={2}>
             <Typography sx={{ color: "success.main" }}>
               Right Answers:{" "}
-              <Typography variant="span" sx={{ color: "success.main" }}>
+              <Typography component="span" sx={{ color: "success.main" }}>
                 {scores?.right}
               </Typography>{" "}
             </Typography>
             <Typography sx={{ color: "error.main" }}>
               Wrong Answers:{" "}
-              <Typography variant="span" sx={{ color: "error.main" }}>
+              <Typography component="span" sx={{ color: "error.main" }}>
                 {scores?.wrong}
               </Typography>
             </Typography>

@@ -1,6 +1,10 @@
 import { Badge } from "@mui/material";
 
-function Badge1({ children, ...props }) {
+interface propTypes {
+  children: React.ReactNode;
+  [props: string]: any;
+}
+function Badge1({ children, ...props }: propTypes) {
   const sx = props?.sx;
   delete props.sx;
   const customProps = {

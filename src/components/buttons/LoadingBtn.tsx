@@ -1,15 +1,22 @@
 import React, { useState } from "react";
 import { Button, CircularProgress } from "@mui/material";
 
+interface propTypes {
+  isLoading?: boolean;
+  onClick?: () => void;
+  children: string;
+  circularProgressProps?: any;
+  [props: string]: any;
+}
 const LoadingButton = ({
   isLoading,
   onClick,
   children,
   circularProgressProps,
   ...props
-}) => {
+}: propTypes) => {
   const [buttonDisabled, setButtonDisabled] = useState(false);
-  const playClickSound = (e) => {
+  const playClickSound = () => {
     const sound = new Audio("/assests/audios/click/button_click.mp3");
     sound.play();
   };

@@ -203,7 +203,7 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
           />
           <Select
             fullWidth
-            mb={4}
+            sx={{ mb: 4 }}
             value={gameId}
             onChange={(e) => setGameId(e.target.value)}
           >
@@ -219,11 +219,11 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
             fullWidth
             color="success"
             disabled={
-              !(userName?.trim("").length >= 4) ||
-              participants > 10 ||
-              participants < 1 ||
-              !(roomName?.trim("").length >= 4) ||
-              !(gameId?.trim("").length >= 5)
+              !(userName?.trim().length >= 4) ||
+              Number(participants) > 10 ||
+              Number(participants) < 1 ||
+              !(roomName?.trim().length >= 4) ||
+              !(gameId?.trim().length >= 5)
             }
             type="submit"
             sx={{ mt: 4 }}

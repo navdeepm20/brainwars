@@ -1,7 +1,18 @@
 //mui
 import { CircularProgress, Paper, Typography } from "@mui/material";
 
-function index({ message, disableMessage, disableMinHeight, ...props }) {
+type loaderPropTypes = {
+  message?: string;
+  disableMessage?: boolean;
+  disableMinHeight?: boolean;
+  [props: string]: any;
+};
+function index({
+  message,
+  disableMessage,
+  disableMinHeight,
+  ...props
+}: loaderPropTypes) {
   return (
     <Paper
       elevation={0}

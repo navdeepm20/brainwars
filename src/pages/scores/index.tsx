@@ -37,10 +37,17 @@ import ConfettiAnimation from "@/components/confetti";
 import { customToast, getModeId } from "@/utils/utils";
 import { gameModeId } from "@/utils/constants";
 
+//node
+import { ParsedUrlQuery } from "querystring";
+
+interface propTypes extends ParsedUrlQuery {
+  rid: string;
+  gsid: string;
+}
 function index({ ...props }) {
   const router = useRouter();
 
-  const { rid: roomId, gsid: gameSessionId } = router.query;
+  const { rid: roomId, gsid: gameSessionId } = router.query as propTypes;
   const [gameInfo, setGameInfo] = useState({});
   const [isGettingData, setIsGettingData] = useState(true);
   const [finalScores, setFinalScores] = useState(null);

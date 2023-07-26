@@ -10,7 +10,7 @@ const ConfettiAnimation = () => {
     <Confetti
       width={window?.innerWidth}
       height={window?.innerHeight}
-      recycle={1000}
+      recycle={true}
       numberOfPieces={200}
     />
   );

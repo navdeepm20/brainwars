@@ -1,11 +1,16 @@
 import { Chip } from "@mui/material";
 
-function Chip1({ fullWidth, noRadius, ...props }) {
+interface propTypes {
+  fullWidth: boolean;
+  noRadius: boolean;
+  [props: string]: any;
+}
+function Chip1({ fullWidth, noRadius, ...props }: propTypes) {
   const sx = props?.sx;
   delete props.sx;
   const customProps = {
     sx: {
-      width: fullWidth ? "100%" : "intial",
+      width: fullWidth ? "100%" : "initial",
       borderRadius: noRadius ? 0 : "",
       ...sx,
     },

@@ -1,7 +1,12 @@
 //mui
 import Button from "@mui/material/Button";
 
-function Btn1({ children, ...props }) {
+interface propTypes {
+  children: string;
+  [props: string]: any;
+}
+
+function Btn1({ children, ...props }: propTypes) {
   const customProps = {
     ...props,
     onClick: () => {

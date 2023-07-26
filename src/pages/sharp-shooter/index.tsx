@@ -23,19 +23,32 @@ import { useRouter } from "next/router";
 import { calculateScores } from "@/utils/components/sharpShooter.js";
 import { customToast, getModeId } from "@/utils/utils";
 import { gameModeId } from "@/utils/constants";
+//node
+import { ParsedUrlQuery } from "querystring";
+
 //These are effective constants. You can direct tweak things from here.
-const MIN = 1;
-const MAX = 15;
-const OPERATORS = ["+", "-"];
-const OPTIONS_DEVIATION = 5;
-const NEXT_QUESTION_DELAY = 1000; //in milliseconds
-const MAX_LIFE_LINES = 3;
-const MAX_SHOOTS = 10;
+const MIN: number = 1;
+const MAX: number = 15;
+const OPERATORS: string[] = ["+", "-"];
+const OPTIONS_DEVIATION: number = 5;
+const NEXT_QUESTION_DELAY: number = 1000; //in milliseconds
+const MAX_LIFE_LINES: number = 3;
+const MAX_SHOOTS: number = 10;
+
+interface routerType extends ParsedUrlQuery {
+  gsid: string | null | undefined;
+  gid: string | null | undefined;
+  rId: string | null | undefined;
+}
 
 function index({ ...props }) {
   const router = useRouter();
-  const { gsid: gameSessionId, gid: gameId, rId: roomId } = router.query;
-  const [modeId, setModeId] = useState();
+  const {
+    gsid: gameSessionId,
+    gid: gameId,
+    rId: roomId,
+  } = router.query as routerType;
+  const [modeId, setModeId] = useState<String | null>(null);
 
   // const [gameSessionInfo, setGameSessionInfo] = useState(null);
 
@@ -64,7 +77,7 @@ function index({ ...props }) {
   });
 
   const [shouldPlayTheme, setShouldPlayTheme] = useState(true);
-  const audioRef = useRef();
+  const audioRef = useRef(null);
 
   //ctx
   // const { currentGame } = useContext(globalContext);
@@ -438,7 +451,7 @@ function index({ ...props }) {
               {shouldPlayTheme ? (
                 <VolumeUpIcon titleAccess="Click Stop Audio" />
               ) : (
-                <VolumeOffIcon title="Click Play Audio" />
+                <VolumeOffIcon titleAccess="Click Play Audio" />
               )}
             </IconButton>
             {shootsLeft >= 0 && lifeLines > 0 ? (
@@ -495,11 +508,11 @@ function index({ ...props }) {
                       minHeight="10rem"
                       alignItems="center"
                     >
-                      <Typography variant="p" sx={{ fontSize: "4rem" }}>
+                      <Typography component="p" sx={{ fontSize: "4rem" }}>
                         {question}
                       </Typography>
                       <Typography
-                        variant="p"
+                        component="p"
                         sx={{
                           fontSize: "4rem",
                           border: (theme) =>
@@ -569,7 +582,7 @@ function index({ ...props }) {
                     ) : (
                       <ScoreCard
                         scores={scores}
-                        disableMessage
+                        disableMessage={true}
                         life={lifeLines}
                         timer={scoresRedirectTimer}
                       />
@@ -585,7 +598,7 @@ function index({ ...props }) {
                     GAME COMPLETED
                   </Typography>
                   {loading?.isLoading ? (
-                    <Loader disableMessage />
+                    <Loader disableMessage={true} />
                   ) : (
                     <ScoreCard
                       completed

@@ -34,14 +34,37 @@ import { globalContext } from "@/context/GlobalContext";
 import { useRouter } from "next/router";
 import { customToast } from "@/utils/utils";
 
+//types
+type gameInfo = {
+  $id: string;
+  name: string;
+};
+type roomData = {
+  $id: string;
+  roomName: string;
+  gameSessions: string[];
+  roomCode: string;
+  maxParticipants: number;
+  gameId: number;
+  status: string;
+  players: string[];
+  creatorId: string;
+};
+type creatorInfo = {
+  $id: string;
+  name: string;
+  creatorId: string;
+  avatarUrl: string;
+};
+
 const GameRoomCard = ({ ...props }) => {
   const router = useRouter();
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const { user, setUser } = useContext(globalContext);
   const [playersInfo, setPlayersInfo] = useState(null);
-  const [roomData, setRoomData] = useState({});
-  const [gameInfo, setGameInfo] = useState({});
-  const [creatorInfo, setCreatorInfo] = useState({});
+  const [roomData, setRoomData] = useState<roomData | null>(null);
+  const [gameInfo, setGameInfo] = useState<gameInfo | null>(null);
+  const [creatorInfo, setCreatorInfo] = useState<creatorInfo | null>();
   const [isGettingData, setIsGettingData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [startTimer, setStartTimer] = useState(false);
@@ -50,7 +73,7 @@ const GameRoomCard = ({ ...props }) => {
   const [isGameAlreadyStarted, setIsGameAlreadyStarted] = useState(false);
 
   //handlers
-  const handleStartGame = async (e) => {
+  const handleStartGame = async () => {
     try {
       setIsSubmitting(true);
       //update room status
@@ -133,14 +156,16 @@ const GameRoomCard = ({ ...props }) => {
         if (roomData?.gameSessions?.length) {
           const gameSessions = roomData?.gameSessions || [];
 
-          const gameSessionPromises = gameSessions.map(async (session) => {
-            return await databases?.getDocument(
-              dbIdMappings?.main,
-              collectionsMapping?.game_session,
-              session,
-              [Query.search("gameSessions", [session])]
-            );
-          });
+          const gameSessionPromises = gameSessions.map(
+            async (session: string) => {
+              return await databases?.getDocument(
+                dbIdMappings?.main,
+                collectionsMapping?.game_session,
+                session,
+                [Query.search("gameSessions", [session])]
+              );
+            }
+          );
 
           const gameSessionsData = await Promise.all(gameSessionPromises);
           const userSession = gameSessionsData.find(
@@ -263,7 +288,7 @@ const GameRoomCard = ({ ...props }) => {
     if (roomData?.$id)
       client.subscribe(
         `databases.${dbIdMappings.main}.collections.${collectionsMapping?.rooms}.documents.${roomData?.$id}`,
-        (response) => {
+        (response: { payload: roomData }) => {
           setRoomData(response?.payload);
         }
       );

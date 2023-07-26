@@ -1,6 +1,11 @@
 import { Stack, Typography, Box } from "@mui/material";
 
-function GameCard({ gameInfo, sx, ...props }) {
+interface propTypes {
+  gameInfo: any;
+  sx?: {};
+  [props: string]: any;
+}
+function GameCard({ gameInfo, sx, ...props }: propTypes) {
   return (
     <Stack
       direction="row"

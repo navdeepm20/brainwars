@@ -14,6 +14,18 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 
 import SVG from "react-inlinesvg";
 
+interface propsTypes {
+  name: string;
+  avatarUrl: string;
+  isCreator?: boolean;
+  opacity?: number;
+  isWinner?: boolean;
+  score?: number;
+  isPlaying?: boolean;
+  sx?: object;
+  [props: string]: any;
+}
+
 const PlayerCard = ({
   name,
   avatarUrl,
@@ -24,7 +36,7 @@ const PlayerCard = ({
   isPlaying,
   sx,
   ...props
-}) => {
+}: propsTypes) => {
   // const config = useMemo(() => genConfig(), []);
 
   return (
@@ -121,5 +133,6 @@ PlayerCard.defaultProps = {
   isCreator: false,
   avatarUrl: "",
   isPlaying: false,
+  isWinner: false,
 };
 export default PlayerCard;
