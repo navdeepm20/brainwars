@@ -29,7 +29,7 @@ const MemoryGame = () => {
   const [cards, setCards] = useState(generateCards());
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [isGameFinished, setIsGameFinished] = useState(false);
-  const [flippedIndexes, setFlippedIndexes] = useState([]);
+  const [flippedIndexes, setFlippedIndexes] = useState<number[]>([]);
 
   useEffect(() => {
     let timeout;
@@ -55,44 +55,42 @@ const MemoryGame = () => {
   }, [isGameStarted]);
 
   const handleCardClick = (index) => {
-    if (
-      !isGameStarted ||
-      flippedIndexes.includes(index) ||
-      cards[index].flipped
-    )
-      return;
-
-    console.log(
-      !isGameStarted,
-      flippedIndexes.includes(index),
-      cards[index].flipped
+    setCards((prevCards) =>
+      prevCards.map((card, i) => {
+        if (i === index) {
+          return { ...card, flipped: true };
+        }
+        return card;
+      })
     );
     const newFlippedIndexes = [...flippedIndexes, index];
-    setFlippedIndexes(newFlippedIndexes);
-
-    if (newFlippedIndexes.length === 2) {
-      const firstCard = cards[newFlippedIndexes[0]];
-      const secondCard = cards[newFlippedIndexes[1]];
-
-      if (firstCard.image === secondCard.image) {
-        setCards((prevCards) =>
-          prevCards.map((card, i) =>
-            newFlippedIndexes.includes(i)
-              ? { ...card, flipped: true, matched: true }
-              : card
-          )
-        );
+    setFlippedIndexes((prev) => {
+      return Array.from(new Set(newFlippedIndexes));
+    });
+    setTimeout(() => {
+      if (newFlippedIndexes?.length === 2) {
+        console.log("length 2");
+        if (
+          cards[newFlippedIndexes[0]]?.image ===
+          cards[newFlippedIndexes[1]]?.image
+        ) {
+          alert("Right Answer");
+          setFlippedIndexes([]);
+        } else {
+          setTimeout(() => {
+            setCards((prev) =>
+              prev.map((card, index) => {
+                if (newFlippedIndexes.includes(index)) {
+                  return { ...card, flipped: false };
+                }
+                return card;
+              })
+            );
+            setFlippedIndexes([]);
+          }, 1000);
+        }
       }
-
-      setTimeout(() => {
-        setCards((prevCards) =>
-          prevCards.map((card, i) =>
-            newFlippedIndexes.includes(i) ? { ...card, flipped: false } : card
-          )
-        );
-        setFlippedIndexes([]);
-      }, 1000);
-    }
+    }, 1000);
   };
 
   const handleStartGame = () => {
@@ -125,12 +123,7 @@ const MemoryGame = () => {
           >
             Start Game
           </Button>
-          <Board
-            cards={cards}
-            onCardClick={handleCardClick}
-            rows={4}
-            cols={4}
-          />
+          <Board cards={cards} onCardClick={handleCardClick} />
         </>
       )}
     </Box>
