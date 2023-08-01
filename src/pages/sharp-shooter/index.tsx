@@ -16,7 +16,6 @@ import {
   collectionsMapping,
   databases,
   dbIdMappings,
-  client,
   getUniqueId,
 } from "@/utils/appwrite/appwriteConfig";
 import { useRouter } from "next/router";
@@ -98,7 +97,7 @@ function index({ ...props }) {
   };
 
   useEffect(() => {
-    const countdownAudio = new Audio("/assests/audios/countdown/countdown.mp3");
+    const countdownAudio = new Audio("/assets/audios/countdown/countdown.mp3");
     countdownAudio.play();
   }, []);
 
@@ -132,7 +131,7 @@ function index({ ...props }) {
       })();
   }, [gameSessionId]);
 
-  //for showing the start timer
+  //for removing the start timer after 4 seconds
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setShowTimer(false);
@@ -220,25 +219,6 @@ function index({ ...props }) {
               isLoading: false,
               msg: "Loading...",
             }));
-
-            // if (modeId) {
-            //   if (modeId === gameModeId?.multi)
-            //     router.push({
-            //       pathname: "/scores",
-            //       query: {
-            //         rid: roomId,
-            //       },
-            //     });
-            //   else
-            //     router.push({
-            //       pathname: "/scores",
-            //       query: {
-            //         gsid: gameSessionId,
-            //       },
-            //     });
-            // } else {
-            //   alert("mode not found");
-            // }
           }, 5000);
         })
         .catch((err) => {
