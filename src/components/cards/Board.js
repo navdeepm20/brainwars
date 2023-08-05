@@ -10,9 +10,10 @@ const Board = ({ cards, onCardClick }) => {
           <Card
             image={card.image}
             flipped={card.flipped}
-            onClick={() => onCardClick(index)}
-            index={index}
+            onClick={onCardClick}
+            cardId={card.id}
             disable={card.disable}
+            cardIndex={index}
           />
         </Grid>
       ))}
