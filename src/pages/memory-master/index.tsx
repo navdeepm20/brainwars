@@ -3,7 +3,9 @@ import { Button, Typography, Box, Paper } from "@mui/material";
 //internal
 import ParticleBg from "@components/particlebg";
 import Board from "@components/cards/Board";
-import Timer from "@components/timer";
+import CountDownTimer from "@/components/countdown_timer";
+import TimeElapsedTimer from "@/components/time_elapsed";
+import CustomButton from "@components/buttons/LoadingBtn";
 
 const images = [
   "/assets/images/1.jpg",
@@ -37,7 +39,8 @@ const MemoryGame = () => {
   const [isGameFinished, setIsGameFinished] = useState(false);
   const [flippedIndexes, setFlippedIndexes] = useState<number[]>([]);
   const [showTimer, setShowTimer] = useState(true);
-  const [matchedCard, setMatchedCards] = useState(0);
+  const [startTimer, setStartTimer] = useState(false);
+  // const [matchedCard, setMatchedCards] = useState(0);
   // const [gameTimer, setGameTimer] = useState(1);
 
   //show cards when game started
@@ -52,7 +55,7 @@ const MemoryGame = () => {
         setCards((prevCards) =>
           prevCards.map((card) => ({ ...card, flipped: false }))
         );
-        setIsGameStarted(true);
+        setStartTimer(true);
       }, 3000);
     }
     return () => clearTimeout(timeout);
@@ -145,7 +148,6 @@ const MemoryGame = () => {
   };
   //check for game over
   useEffect(() => {
-    console.log(cards);
     const isGameOver = cards.every((card) => card.matched);
     if (isGameOver) {
       setIsGameFinished(true);
@@ -183,7 +185,7 @@ const MemoryGame = () => {
         }}
       >
         {showTimer ? (
-          <Timer />
+          <CountDownTimer />
         ) : (
           <>
             <Typography variant="h5" gutterBottom>
@@ -195,13 +197,14 @@ const MemoryGame = () => {
               </Typography>
             ) : (
               <>
-                <Button
-                  variant="contained"
+                <CustomButton
+                  variant="outlined"
                   onClick={handleStartGame}
                   disabled={isGameStarted}
                 >
                   Start Game
-                </Button>
+                </CustomButton>
+                <TimeElapsedTimer startTimer={startTimer} />
                 <Board cards={cards} onCardClick={handleCardClick} />
               </>
             )}

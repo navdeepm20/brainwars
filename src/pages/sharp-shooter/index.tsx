@@ -9,7 +9,7 @@ import Btn1 from "@/components/buttons/Btn1";
 import ParticleBg from "@components/particlebg";
 import ScoreCard from "@components/cards/ScoresCard";
 import Loader from "@/components/loader";
-import Timer from "@/components/timer";
+import Timer from "@/components/countdown_timer";
 
 //appwrite
 import {
