@@ -20,7 +20,7 @@ export const customToast = (message, type, options = {}) => {
     case "success":
       return toast.success(message, {
         onOpen: () => {
-          const audio = new Audio("/assests/audios/notification/simple.mp3");
+          const audio = new Audio("/assets/audios/notification/simple.mp3");
           audio.play();
         },
         ...options,
@@ -28,7 +28,7 @@ export const customToast = (message, type, options = {}) => {
     case "error":
       return toast.error(message, {
         onOpen: () => {
-          const audio = new Audio("/assests/audios/notification/simple.mp3");
+          const audio = new Audio("/assets/audios/notification/simple.mp3");
           audio.play();
         },
         ...options,
@@ -36,7 +36,7 @@ export const customToast = (message, type, options = {}) => {
     case "info":
       return toast.info(message, {
         onOpen: () => {
-          const audio = new Audio("/assests/audios/notification/simple.mp3");
+          const audio = new Audio("/assets/audios/notification/simple.mp3");
           audio.play();
         },
         ...options,
@@ -44,7 +44,7 @@ export const customToast = (message, type, options = {}) => {
     case "warning":
       return toast.warning(message, {
         onOpen: () => {
-          const audio = new Audio("/assests/audios/notification/simple.mp3");
+          const audio = new Audio("/assets/audios/notification/simple.mp3");
           audio.play();
         },
         ...options,
@@ -53,7 +53,7 @@ export const customToast = (message, type, options = {}) => {
     default:
       return toast.info(message, {
         onOpen: () => {
-          const audio = new Audio("/assests/audios/notification/simple.mp3");
+          const audio = new Audio("/assets/audios/notification/simple.mp3");
           audio.play();
         },
         ...options,

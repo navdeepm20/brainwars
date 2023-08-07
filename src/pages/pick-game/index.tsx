@@ -1,6 +1,7 @@
 //mui
 import { Paper, Box, Typography, Stack, ButtonBase, Fade } from "@mui/material";
 import CalculateOutlinedIcon from "@mui/icons-material/CalculateOutlined";
+import ExtensionOutlinedIcon from "@mui/icons-material/ExtensionOutlined";
 //internal components
 import ParticleBg from "@components/particlebg";
 import Loader from "@components/loader";
@@ -87,7 +88,64 @@ function index({ games, ...props }) {
     }
   };
 
-  // const handleMemoryMaster = (e) => {};
+  const handleMemoryMaster = async (e, game) => {
+    if (params.name) {
+      const modeId = getModeId();
+      if (modeId) {
+        dispatch({
+          type: "putState",
+          payload: {
+            gameId: game?.$id,
+            gameName: game?.gameName,
+            gameType: game?.gameType,
+            maxLifes: game?.maxLifes,
+          },
+        });
+        setIsSubmitting(true);
+        const avatarUrl = await getRandomAvatarUrl();
+
+        const response = await databases.createDocument(
+          dbIdMappings?.main,
+          collectionsMapping?.gamers,
+          getUniqueId(),
+          {
+            name: params?.name,
+            isAuthenticated: false,
+            avatarUrl: avatarUrl,
+          }
+        );
+        const promise = databases.createDocument(
+          dbIdMappings.main,
+          collectionsMapping.game_session,
+          getUniqueId(),
+          {
+            gameId: game?.$id,
+            creatorName: params?.name,
+            creatorId: response?.$id,
+          }
+        );
+
+        promise
+          .then((response) => {
+            setIsSubmitting(false);
+            router.push({
+              pathname: "/memory-master",
+              query: {
+                gsid: response?.$id,
+                gid: game?.$id,
+                mid: modeId,
+              },
+            });
+          })
+          .catch((err) => {
+            setIsSubmitting(false);
+            customToast(err?.message, "error");
+          });
+      }
+    } else {
+      customToast("Mode Id not Found. Please restart the game", "error");
+    }
+  };
 
   return (
     <Fade in={true}>
@@ -140,10 +198,12 @@ function index({ games, ...props }) {
                     <ButtonBase
                       onClick={(e) => {
                         const sound = new Audio(
-                          "/assests/audios/click/button_click.mp3"
+                          "/assets/audios/click/button_click.mp3"
                         );
                         sound.play();
-                        handleSharpShooter(e, game);
+                        game?.gameName === "sharp shooter"
+                          ? handleSharpShooter(e, game)
+                          : handleMemoryMaster(e, game);
                       }}
                       key={index}
                     >
@@ -193,49 +253,6 @@ function index({ games, ...props }) {
               ) : (
                 <Typography>No Games Found</Typography>
               )}
-
-              {/* <ButtonBase onClick={handleMemoryMaster}>
-            <Stack
-              justifyContent="center"
-              alignItems="center"
-              spacing={2}
-              sx={{
-                border: (theme) =>
-                  `1px solid ${theme.palette.customTheme.customGrey}`,
-                cursor: "pointer",
-                transition: ".3s border ease-in",
-
-                ":hover": {
-                  border: (theme) =>
-                    `1px solid ${theme.palette.customTheme.text3}`,
-                  "& > .MuiTypography-root": {
-                    color: "customTheme.text3",
-                  },
-                  "& > .MuiSvgIcon-root": {
-                    color: "customTheme.text3",
-                  },
-                },
-              }}
-              p={4}
-              borderRadius={1}
-            >
-              <ExtensionOutlinedIcon
-                sx={{
-                  color: "customTheme.text2",
-                  transition: ".3s color ease",
-                }}
-              />
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "customTheme.text2",
-                  transition: ".3s color ease",
-                }}
-              >
-                Memory Master
-              </Typography>
-            </Stack>
-          </ButtonBase> */}
             </Stack>
           )}
           <Typography

@@ -1,5 +1,5 @@
 //react
-import { useState, useRef } from "react";
+import { useState } from "react";
 //mui
 import { Typography } from "@mui/material";
 import { useEffect } from "react";
@@ -9,7 +9,7 @@ interface Props {
   startTimer: boolean;
   [props: string]: any;
 }
-function index({ title, startTimer, ...props }: Props) {
+function index({ title, startTimer, sx, ...props }: Props) {
   const [gameTimer, setGameTimer] = useState<number>(0);
 
   useEffect(() => {
@@ -31,8 +31,8 @@ function index({ title, startTimer, ...props }: Props) {
     minutes
   ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   return (
-    <Typography component="p" mt={2} sx={{ color: "customTheme.text2" }}>
-      Time Elapsed: {formattedTime}
+    <Typography component="p" sx={{ color: "customTheme.text2", ...sx }}>
+      Time Elapsed: <Typography component="span">{formattedTime}</Typography>
     </Typography>
   );
 }

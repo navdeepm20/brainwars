@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Button, Typography, Box, Paper } from "@mui/material";
+import { Stack, Typography, Box, Paper } from "@mui/material";
 //internal
 import ParticleBg from "@components/particlebg";
 import Board from "@components/cards/Board";
 import CountDownTimer from "@/components/countdown_timer";
 import TimeElapsedTimer from "@/components/time_elapsed";
 import CustomButton from "@components/buttons/LoadingBtn";
-
+import GameSoundPlayer from "@components/game_sound_player";
 const images = [
   "/assets/images/1.jpg",
   "/assets/images/2.jpg",
@@ -188,8 +188,12 @@ const MemoryGame = () => {
           <CountDownTimer />
         ) : (
           <>
+            <GameSoundPlayer
+              musicPath="/assets/audios/game/music.mp3"
+              sx={{ mb: 0 }}
+            />
             <Typography variant="h5" gutterBottom>
-              Memory Block Game
+              Memory Master
             </Typography>
             {isGameFinished ? (
               <Typography variant="h6" gutterBottom>
@@ -197,15 +201,41 @@ const MemoryGame = () => {
               </Typography>
             ) : (
               <>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  sx={{ width: "100%", mt: 4 }}
+                >
+                  <TimeElapsedTimer
+                    startTimer={startTimer}
+                    sx={{
+                      color: "customTheme.text2",
+                      "& span": {
+                        color: "customTheme.text",
+                      },
+                    }}
+                  />
+                  <Typography sx={{ color: "customTheme.text2" }}>
+                    No. Of Moves:{" "}
+                    <Typography
+                      component="span"
+                      sx={{
+                        color: "customTheme.text",
+                      }}
+                    >
+                      5
+                    </Typography>
+                  </Typography>
+                </Stack>
+                <Board cards={cards} onCardClick={handleCardClick} />
                 <CustomButton
                   variant="outlined"
                   onClick={handleStartGame}
                   disabled={isGameStarted}
+                  sx={{ mt: 4 }}
                 >
                   Start Game
                 </CustomButton>
-                <TimeElapsedTimer startTimer={startTimer} />
-                <Board cards={cards} onCardClick={handleCardClick} />
               </>
             )}
           </>

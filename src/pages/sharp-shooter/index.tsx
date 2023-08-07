@@ -10,6 +10,7 @@ import ParticleBg from "@components/particlebg";
 import ScoreCard from "@components/cards/ScoresCard";
 import Loader from "@/components/loader";
 import Timer from "@/components/countdown_timer";
+import GameSoundPlayer from "@components/game_sound_player";
 
 //appwrite
 import {
@@ -48,9 +49,7 @@ function index({ ...props }) {
     rId: roomId,
   } = router.query as routerType;
   const [modeId, setModeId] = useState<String | null>(null);
-
   // const [gameSessionInfo, setGameSessionInfo] = useState(null);
-
   const [showTimer, setShowTimer] = useState(true);
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(null);
@@ -75,26 +74,11 @@ function index({ ...props }) {
     msg: "",
   });
 
-  const [shouldPlayTheme, setShouldPlayTheme] = useState(true);
-  const audioRef = useRef(null);
-
   //ctx
   // const { currentGame } = useContext(globalContext);
 
   const [lifeLines, setLifeLines] = useState(MAX_LIFE_LINES);
   const isMounted = useRef(false);
-
-  //for game music
-  const handleAudioPlayBack = () => {
-    setShouldPlayTheme((prev) => {
-      if (prev) {
-        audioRef?.current?.pause();
-      } else {
-        audioRef?.current?.play();
-      }
-      return !prev;
-    });
-  };
 
   useEffect(() => {
     const countdownAudio = new Audio("/assets/audios/countdown/countdown.mp3");
@@ -243,7 +227,6 @@ function index({ ...props }) {
         .then((response) => {
           if (modeId) {
             if (modeId === gameModeId?.multi) {
-              handleAudioPlayBack();
               router.push({
                 pathname: "/scores",
                 query: {
@@ -252,7 +235,6 @@ function index({ ...props }) {
                 },
               });
             } else {
-              handleAudioPlayBack();
               router.push({
                 pathname: "/scores",
                 query: {
@@ -427,13 +409,7 @@ function index({ ...props }) {
           <Timer />
         ) : (
           <>
-            <IconButton onClick={handleAudioPlayBack} sx={{ mb: 2 }}>
-              {shouldPlayTheme ? (
-                <VolumeUpIcon titleAccess="Click Stop Audio" />
-              ) : (
-                <VolumeOffIcon titleAccess="Click Play Audio" />
-              )}
-            </IconButton>
+            <GameSoundPlayer musicPath="/assets/audios/game/music.mp3" />
             {shootsLeft >= 0 && lifeLines > 0 ? (
               <Typography variant="button" sx={{ color: "success.main" }}>
                 Life: {lifeLines}❤️
@@ -592,12 +568,6 @@ function index({ ...props }) {
             </>
           </>
         )}
-        <audio
-          src="/assests/audios/game/music.mp3"
-          ref={audioRef}
-          autoPlay={shouldPlayTheme}
-          loop={true}
-        ></audio>
       </Paper>
     </Box>
   );

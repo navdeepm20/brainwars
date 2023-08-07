@@ -29,7 +29,7 @@ import {
   collectionsMapping,
 } from "../utils/appwrite/appwriteConfig";
 //sounds
-// import notifcationSound from "@public/assests/audios/notification/mario_coin.mp3";
+// import notifcationSound from "@public/assets/audios/notification/mario_coin.mp3";
 
 function index({ games, ...props }) {
   const { setGames, setMetaInfo } = useContext(globalContext);

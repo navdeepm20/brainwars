@@ -1,6 +1,6 @@
 import React from "react";
 import { Card as MuiCard, CardMedia } from "@mui/material";
-// import CardBack from "@public/assests/images/card-back.jpg";
+// import CardBack from "@public/assets/images/card-back.jpg";
 const Card = ({ cardId, image, flipped, disable, onClick, cardIndex }) => {
   return (
     <MuiCard

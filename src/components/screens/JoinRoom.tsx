@@ -139,7 +139,7 @@ function JoinRoom({ goBackHandler, ...props }) {
         <IconButton
           sx={{ justifyContent: "flex-start", alignSelf: "flex-start" }}
           onClick={() => {
-            const sound = new Audio("/assests/audios/click/button_click.mp3");
+            const sound = new Audio("/assets/audios/click/button_click.mp3");
             sound.play();
             goBackHandler();
           }}

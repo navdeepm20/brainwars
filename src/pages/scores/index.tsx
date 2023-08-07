@@ -56,7 +56,7 @@ function index({ ...props }) {
   const [isScoreCalculated, setIsScoreCalculated] = useState(false);
 
   const playVictorySound = () => {
-    const audio = new Audio("/assests/audios/victory/victory.mp3");
+    const audio = new Audio("/assets/audios/victory/victory.mp3");
     audio.play();
   };
 
