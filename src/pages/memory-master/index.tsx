@@ -7,6 +7,8 @@ import CountDownTimer from "@/components/countdown_timer";
 import TimeElapsedTimer from "@/components/time_elapsed";
 import CustomButton from "@components/buttons/LoadingBtn";
 import GameSoundPlayer from "@components/game_sound_player";
+//utils
+import { playSound } from "@/utils/utils";
 const images = [
   "/assets/images/1.jpg",
   "/assets/images/2.jpg",
@@ -40,8 +42,7 @@ const MemoryGame = () => {
   const [flippedIndexes, setFlippedIndexes] = useState<number[]>([]);
   const [showTimer, setShowTimer] = useState(true);
   const [startTimer, setStartTimer] = useState(false);
-  // const [matchedCard, setMatchedCards] = useState(0);
-  // const [gameTimer, setGameTimer] = useState(1);
+  const [totalMoves, setTotalMoves] = useState(0);
 
   //show cards when game started
   useEffect(() => {
@@ -131,6 +132,8 @@ const MemoryGame = () => {
   //handle card click
   const handleCardClick = (cardId, cardImage, cardIndex) => {
     if (isGameStarted) {
+      playSound();
+      setTotalMoves((prev) => prev + 1);
       if (flippedIndexes.length < 1) {
         handleCardFlip(cardId, cardImage, cardIndex);
       } else {
@@ -223,7 +226,7 @@ const MemoryGame = () => {
                         color: "customTheme.text",
                       }}
                     >
-                      5
+                      {totalMoves}
                     </Typography>
                   </Typography>
                 </Stack>

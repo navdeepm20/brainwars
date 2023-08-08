@@ -63,3 +63,8 @@ export const customToast = (message, type, options = {}) => {
 
 export const getModeId = () => sessionStorage.getItem("mid");
 export const setModeId = (id) => sessionStorage.setItem("mid", id);
+
+export const playSound = (soundPath = "/assets/audios/click/button_click.mp3") => {
+  const sound = new Audio(soundPath);
+  sound.play();
+};

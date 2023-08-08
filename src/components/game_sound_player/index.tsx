@@ -13,8 +13,8 @@ interface PropsType {
 
 function index({ musicPath, sx, defaultPlay = true, ...props }: PropsType) {
   const [shouldPlayTheme, setShouldPlayTheme] = useState(defaultPlay);
-  const audioRef = useRef(null);
-
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const isMounted = useRef(false);
   const handleAudioPlayBack = () => {
     setShouldPlayTheme((prev) => {
       if (prev) {
@@ -25,12 +25,16 @@ function index({ musicPath, sx, defaultPlay = true, ...props }: PropsType) {
       return !prev;
     });
   };
+
   useEffect(() => {
-    if (shouldPlayTheme) {
-      audioRef?.current?.play();
+    if (!isMounted.current) {
+      if (shouldPlayTheme) {
+        audioRef?.current?.play();
+      }
     }
     return () => {
-      handleAudioPlayBack();
+      if (isMounted.current) handleAudioPlayBack();
+      isMounted.current = true;
     };
   }, []);
 
