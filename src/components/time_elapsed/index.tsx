@@ -7,15 +7,19 @@ import { useEffect } from "react";
 interface Props {
   title?: string;
   startTimer: boolean;
+  getElapsedTime: (timeElapsed: number) => number;
   [props: string]: any;
 }
-function index({ title, startTimer, sx, ...props }: Props) {
+function index({ title, startTimer, getElapsedTime, sx, ...props }: Props) {
   const [gameTimer, setGameTimer] = useState<number>(0);
 
   useEffect(() => {
     if (startTimer) {
       let intervalId = setInterval(() => {
-        setGameTimer((prev) => prev + 1);
+        setGameTimer((prev) => {
+          getElapsedTime(prev + 1);
+          return prev + 1;
+        });
       }, 1000);
       return () => {
         clearInterval(intervalId);

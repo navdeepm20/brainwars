@@ -1,7 +1,7 @@
 //react
 import { useState, useEffect, useRef } from "react";
 //mui
-import { Paper, Typography, Stack, Box, IconButton } from "@mui/material";
+import { Paper, Typography, Stack, Box } from "@mui/material";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 //internal components
@@ -19,7 +19,9 @@ import {
   dbIdMappings,
   getUniqueId,
 } from "@/utils/appwrite/appwriteConfig";
+//next
 import { useRouter } from "next/router";
+//utils
 import { calculateScores } from "@/utils/components/sharpShooter.js";
 import { customToast, getModeId } from "@/utils/utils";
 import { gameModeId } from "@/utils/constants";
