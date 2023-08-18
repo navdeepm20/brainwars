@@ -67,7 +67,7 @@ const MemoryGame = () => {
     gid: gameId,
     rId: roomId,
   } = router.query as routerType;
-
+  const [modeId, setModeId] = useState(null);
   const [cards, setCards] = useState(generateCards());
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [isGameFinished, setIsGameFinished] = useState(false);
@@ -100,6 +100,7 @@ const MemoryGame = () => {
   useEffect(() => {
     if (gameSessionId)
       (async () => {
+        setModeId(getModeId());
         try {
           await databases.updateDocument(
             dbIdMappings?.main,
@@ -118,6 +119,31 @@ const MemoryGame = () => {
   const getTimeElapsed = (timeElapsed: number): void =>
     setCurrentElapsedTime(timeElapsed);
 
+  //send realtime game updates
+  useEffect(() => {
+    sendDataRealtime();
+  }, [totalRightPairs]);
+
+  //check for game over
+  useEffect(() => {
+    const isGameOver = cards.every((card) => card.matched);
+    if (isGameOver) {
+      setIsGameFinished(true);
+    }
+  }, [cards]);
+
+  //for removing the start timer after 4 seconds
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setShowTimer(false);
+    }, 4000);
+    const countdownAudio = new Audio("/assets/audios/countdown/countdown.mp3");
+    countdownAudio.play();
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
   //function to send data in realtime to server
   function sendDataRealtime() {
     const promise = databases.updateDocument(
@@ -134,18 +160,11 @@ const MemoryGame = () => {
       }
     );
     promise
-      .then((response) => {
-        console.log(response);
-      })
+      .then((response) => {})
       .catch((err) => {
         customToast(err?.message, "error");
       });
   }
-  //send realtime game updates
-  useEffect(() => {
-    sendDataRealtime();
-  }, [totalRightPairs]);
-
   //handle card flip
   const handleCardFlip = (clickedCardId, cardImage, cardIndex) => {
     const newFlippedIndexes = [...flippedIndexes, cardIndex];
@@ -233,25 +252,6 @@ const MemoryGame = () => {
     setFlippedIndexes([]);
     setCards(generateCards());
   };
-  //check for game over
-  useEffect(() => {
-    const isGameOver = cards.every((card) => card.matched);
-    if (isGameOver) {
-      setIsGameFinished(true);
-    }
-  }, [cards]);
-
-  //for removing the start timer after 4 seconds
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setShowTimer(false);
-    }, 4000);
-    const countdownAudio = new Audio("/assets/audios/countdown/countdown.mp3");
-    countdownAudio.play();
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, []);
 
   return (
     <Box width="100%">
@@ -282,7 +282,30 @@ const MemoryGame = () => {
               Memory Master
             </Typography>
             {isGameFinished ? (
-              <GameCompleted />
+              <GameCompleted
+                onTimerCompleted={() => {
+                  if (modeId && isGameFinished) {
+                    if (modeId === gameModeId?.multi) {
+                      router.push({
+                        pathname: "/scores",
+                        query: {
+                          rid: roomId,
+                          gsid: gameSessionId,
+                        },
+                      });
+                    } else {
+                      router.push({
+                        pathname: "/scores",
+                        query: {
+                          gsid: gameSessionId,
+                        },
+                      });
+                    }
+                  }
+                }}
+                showTimer={true}
+                maxRedirectTime={5}
+              />
             ) : (
               <>
                 <Stack

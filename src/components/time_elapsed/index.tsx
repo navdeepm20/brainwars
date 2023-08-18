@@ -10,6 +10,7 @@ interface Props {
   getElapsedTime: (timeElapsed: number) => void;
   [props: string]: any;
 }
+
 function index({ title, startTimer, getElapsedTime, sx, ...props }: Props) {
   const [gameTimer, setGameTimer] = useState<number>(0);
 
