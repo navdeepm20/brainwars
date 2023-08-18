@@ -82,12 +82,13 @@ function index({ ...props }) {
   const [lifeLines, setLifeLines] = useState(MAX_LIFE_LINES);
   const isMounted = useRef(false);
 
+  //for playing countdown audio
   useEffect(() => {
     const countdownAudio = new Audio("/assets/audios/countdown/countdown.mp3");
     countdownAudio.play();
   }, []);
 
-  //adding realtime updates
+ 
   useEffect(() => {
     if (!isMounted.current) {
       generateQuestion();
@@ -99,6 +100,7 @@ function index({ ...props }) {
       isMounted.current = true;
     };
   }, []);
+  //update game session status to inprogress
   useEffect(() => {
     if (gameSessionId)
       (async () => {
@@ -253,6 +255,7 @@ function index({ ...props }) {
         });
     }
   }, [intervalId, scoresRedirectTimer]);
+  
   //send data in realtime to server
   function sendDataRealtime({ wrong, right, deductLife, ...props }) {
     setLoading((prev) => {

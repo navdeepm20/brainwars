@@ -143,7 +143,7 @@ const MemoryGame = () => {
   //send realtime game updates
   useEffect(() => {
     sendDataRealtime();
-  }, [totalMoves]);
+  }, [totalRightPairs]);
 
   //handle card flip
   const handleCardFlip = (clickedCardId, cardImage, cardIndex) => {
@@ -237,7 +237,6 @@ const MemoryGame = () => {
     const isGameOver = cards.every((card) => card.matched);
     if (isGameOver) {
       setIsGameFinished(true);
-      alert("Game finished");
     }
   }, [cards]);
 
