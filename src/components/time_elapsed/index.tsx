@@ -7,7 +7,7 @@ import { useEffect } from "react";
 interface Props {
   title?: string;
   startTimer: boolean;
-  getElapsedTime: (timeElapsed: number) => number;
+  getElapsedTime: (timeElapsed: number) => void;
   [props: string]: any;
 }
 function index({ title, startTimer, getElapsedTime, sx, ...props }: Props) {

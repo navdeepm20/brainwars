@@ -2,8 +2,6 @@
 import { useState, useEffect, useRef } from "react";
 //mui
 import { Paper, Typography, Stack, Box } from "@mui/material";
-import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 //internal components
 import Btn1 from "@/components/buttons/Btn1";
 import ParticleBg from "@components/particlebg";
@@ -11,7 +9,7 @@ import ScoreCard from "@components/cards/ScoresCard";
 import Loader from "@/components/loader";
 import Timer from "@/components/countdown_timer";
 import GameSoundPlayer from "@components/game_sound_player";
-
+import GameCompleted from "@/components/cards/GameCompleted";
 //appwrite
 import {
   collectionsMapping,
@@ -88,7 +86,6 @@ function index({ ...props }) {
     countdownAudio.play();
   }, []);
 
- 
   useEffect(() => {
     if (!isMounted.current) {
       generateQuestion();
@@ -255,7 +252,7 @@ function index({ ...props }) {
         });
     }
   }, [intervalId, scoresRedirectTimer]);
-  
+
   //send data in realtime to server
   function sendDataRealtime({ wrong, right, deductLife, ...props }) {
     setLoading((prev) => {
@@ -551,24 +548,22 @@ function index({ ...props }) {
                   </>
                 )
               ) : (
-                <>
-                  <Typography mt={1} mb={2} align="center">
-                    Congratulation's 🎉
-                  </Typography>
-                  <Typography sx={{ fontSize: "3rem", mb: "3rem" }}>
-                    GAME COMPLETED
-                  </Typography>
-                  {loading?.isLoading ? (
-                    <Loader disableMessage={true} />
-                  ) : (
-                    <ScoreCard
-                      completed
-                      scores={scores}
-                      life={lifeLines}
-                      timer={scoresRedirectTimer}
-                    />
-                  )}
-                </>
+                <GameCompleted
+                  addtionalComponent={
+                    <div>
+                      {loading?.isLoading ? (
+                        <Loader disableMessage={true} />
+                      ) : (
+                        <ScoreCard
+                          completed
+                          scores={scores}
+                          life={lifeLines}
+                          timer={scoresRedirectTimer}
+                        />
+                      )}
+                    </div>
+                  }
+                />
               )}
             </>
           </>

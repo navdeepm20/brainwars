@@ -23,6 +23,7 @@ import {
 } from "@/utils/appwrite/appwriteConfig";
 //node
 import { ParsedUrlQuery } from "querystring";
+import GameCompleted from "@/components/cards/GameCompleted";
 
 //TOTAL PAIRS
 const TOTAL_CARD_PAIRS = 6;
@@ -281,9 +282,7 @@ const MemoryGame = () => {
               Memory Master
             </Typography>
             {isGameFinished ? (
-              <Typography variant="h6" gutterBottom>
-                Congratulations! You've completed the game.
-              </Typography>
+              <GameCompleted />
             ) : (
               <>
                 <Stack
