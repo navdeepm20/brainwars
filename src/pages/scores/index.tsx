@@ -34,7 +34,7 @@ import {
 
 //internal
 import ConfettiAnimation from "@/components/confetti";
-import { customToast, getModeId } from "@/utils/utils";
+import { customToast, getGameScoreFunctionId, getModeId } from "@/utils/utils";
 import { gameModeId } from "@/utils/constants";
 
 //node
@@ -132,24 +132,21 @@ function index({ ...props }) {
         const gameInfo = await fetchGameInfo(gameSessionInfo?.gameId);
         setGameInfo(gameInfo);
         const playerInfo = await getPlayerInfo(gameSessionInfo?.creatorId);
-        // const finalCalculatedScores = calculateSinglePlayerScores(
-        //   scoresInfo?.documents[0]?.score,
-        //   playerInfo
-        // );
-        // setFinalScores(finalCalculatedScores);
 
         //cloud function to calculate the scores.
-
+        console.log(
+          {
+            mode: "single",
+            data: { ...JSON.parse(gameSessionInfo.extras), ...playerInfo },
+          },
+          "jlakjsdlkfjalsjdfljasdf"
+        );
         functions
           .createExecution(
-            "6485aeaf40916b78b283",
+            getGameScoreFunctionId(gameSessionInfo?.gameId),
             JSON.stringify({
               mode: "single",
-              data: {
-                score: scoresInfo?.documents[0]?.score,
-                playerInfo,
-                time: gameSessionInfo?.timeElapsed,
-              },
+              data: { ...JSON.parse(gameSessionInfo.extras), playerInfo },
             })
           )
           .then((response) => {

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Stack, Typography, Box, Paper } from "@mui/material";
+
 //internal
 import ParticleBg from "@components/particlebg";
 import Board from "@components/cards/Board";
@@ -7,19 +8,20 @@ import CountDownTimer from "@/components/countdown_timer";
 import TimeElapsedTimer from "@/components/time_elapsed";
 import CustomButton from "@components/buttons/LoadingBtn";
 import GameSoundPlayer from "@components/game_sound_player";
+
 //utils
 import { playSound } from "@/utils/utils";
-import { calculateScores } from "@/utils/components/sharpShooter.js";
 import { customToast, getModeId } from "@/utils/utils";
 import { gameModeId } from "@/utils/constants";
+
 //next
 import { useRouter } from "next/router";
+
 //appwrite
 import {
   collectionsMapping,
   databases,
   dbIdMappings,
-  getUniqueId,
 } from "@/utils/appwrite/appwriteConfig";
 //node
 import { ParsedUrlQuery } from "querystring";
@@ -67,6 +69,8 @@ const MemoryGame = () => {
     gid: gameId,
     rId: roomId,
   } = router.query as routerType;
+  const gameTimerRef = useRef<number>(null);
+
   const [modeId, setModeId] = useState(null);
   const [cards, setCards] = useState(generateCards());
   const [isGameStarted, setIsGameStarted] = useState(false);
@@ -77,7 +81,7 @@ const MemoryGame = () => {
   const [totalMoves, setTotalMoves] = useState(0);
   const [totalRightPairs, setTotalRightPairs] = useState(0);
   //for child component state
-  const [currentElapsedTime, setCurrentElapsedTime] = useState(0);
+
   //show cards when game started
   useEffect(() => {
     let timeout;
@@ -115,9 +119,6 @@ const MemoryGame = () => {
         }
       })();
   }, [gameSessionId]);
-  //function to get the child component state for time elapsed
-  const getTimeElapsed = (timeElapsed: number): void =>
-    setCurrentElapsedTime(timeElapsed);
 
   //send realtime game updates
   useEffect(() => {
@@ -153,7 +154,7 @@ const MemoryGame = () => {
       {
         extras: JSON.stringify({
           movesDone: totalMoves,
-          timeElapsed: currentElapsedTime,
+          timeElapsed: gameTimerRef?.current,
           totalPairs: TOTAL_CARD_PAIRS,
           rightPairFlipped: totalRightPairs,
         }),
@@ -315,7 +316,7 @@ const MemoryGame = () => {
                 >
                   <TimeElapsedTimer
                     startTimer={startTimer}
-                    getElapsedTime={getTimeElapsed}
+                    timerRef={gameTimerRef}
                     sx={{
                       color: "customTheme.text2",
                       "& span": {

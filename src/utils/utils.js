@@ -64,7 +64,20 @@ export const customToast = (message, type, options = {}) => {
 export const getModeId = () => sessionStorage.getItem("mid");
 export const setModeId = (id) => sessionStorage.setItem("mid", id);
 
-export const playSound = (soundPath = "/assets/audios/click/button_click.mp3") => {
+export const playSound = (
+  soundPath = "/assets/audios/click/button_click.mp3"
+) => {
   const sound = new Audio(soundPath);
   sound.play();
+};
+
+export const getGameScoreFunctionId = (gameId) => {
+  switch (gameId) {
+    case "64d145a0cc7e92844e81": //memory master
+      return "64e0a02a6088b749fc1a";
+    case "6476533db5284c9d7f9d": //sharpshooter
+      return "6485aeaf40916b78b283";
+    default:
+      return null;
+  }
 };
