@@ -81,3 +81,16 @@ export const getGameScoreFunctionId = (gameId) => {
       return null;
   }
 };
+
+export const getGameRoute = (gameId) => {
+  console.log("inside", gameId);
+  switch (gameId) {
+    case "64d145a0cc7e92844e81": //memory master
+      console.log("mmmmmmmmmmmmmmmm");
+      return "/sharp-shooter";
+    case "6476533db5284c9d7f9d": //sharpshooter
+      return "/memory-master";
+    default:
+      return null;
+  }
+};

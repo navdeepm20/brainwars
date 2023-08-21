@@ -32,7 +32,7 @@ import Loader from "@/components/loader";
 import { globalContext } from "@/context/GlobalContext";
 //njs
 import { useRouter } from "next/router";
-import { customToast } from "@/utils/utils";
+import { customToast, getGameRoute } from "@/utils/utils";
 
 //types
 type gameInfo = {
@@ -59,6 +59,8 @@ type creatorInfo = {
 
 const GameRoomCard = ({ ...props }) => {
   const router = useRouter();
+  const { lobbyId } = router.query;
+
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const { user, setUser } = useContext(globalContext);
   const [playersInfo, setPlayersInfo] = useState(null);
@@ -71,7 +73,19 @@ const GameRoomCard = ({ ...props }) => {
   const [roomId, setRoomId] = useState("");
   const [timeoutTime, setTimeoutTime] = useState(10);
   const [isGameAlreadyStarted, setIsGameAlreadyStarted] = useState(false);
+  const [lobbyInfo, setLobbyInfo] = useState(null);
 
+  useEffect(() => {
+    if (lobbyId)
+      (async () => {
+        const response = await databases?.getDocument(
+          dbIdMappings?.main,
+          collectionsMapping?.rooms,
+          lobbyId
+        );
+        setLobbyInfo(response);
+      })();
+  }, [lobbyId]);
   //handlers
   const handleStartGame = async () => {
     try {
@@ -174,7 +188,7 @@ const GameRoomCard = ({ ...props }) => {
 
           if (userSession) {
             router.push({
-              pathname: "/sharp-shooter",
+              pathname: getGameRoute(lobbyInfo?.gameId),
               query: {
                 gsid: userSession?.$id,
                 gid: userSession?.gameId,

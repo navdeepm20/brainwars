@@ -134,13 +134,7 @@ function index({ ...props }) {
         const playerInfo = await getPlayerInfo(gameSessionInfo?.creatorId);
 
         //cloud function to calculate the scores.
-        console.log(
-          {
-            mode: "single",
-            data: { ...JSON.parse(gameSessionInfo.extras), ...playerInfo },
-          },
-          "jlakjsdlkfjalsjdfljasdf"
-        );
+
         functions
           .createExecution(
             getGameScoreFunctionId(gameSessionInfo?.gameId),

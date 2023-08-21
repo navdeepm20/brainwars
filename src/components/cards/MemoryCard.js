@@ -9,7 +9,8 @@ const Card = ({ cardId, image, flipped, disable, onClick, cardIndex }) => {
       }}
       sx={{
         cursor: flipped ? "not-allowed" : "pointer",
-
+        transform: flipped ? "rotateY(180deg)" : "",
+        transition: ".7s transform ease",
         width: "100px",
         mx: "auto",
       }}
