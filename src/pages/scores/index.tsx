@@ -199,10 +199,10 @@ function index({ ...props }) {
           const allLinkedPlayersScores = await fetchScoresInfo(
             allLinkedGameSessions
           );
-
+          console.log(gameSessionsInfo);
           functions
             .createExecution(
-              "6485aeaf40916b78b283",
+              getGameScoreFunctionId(gameSessionsInfo[0]?.data?.gameId),
               JSON.stringify({
                 mode: "multi",
                 data: {

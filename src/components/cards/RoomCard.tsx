@@ -185,6 +185,19 @@ const GameRoomCard = ({ ...props }) => {
           const userSession = gameSessionsData.find(
             (session) => session?.creatorId === user?.id
           );
+          console.log(
+            {
+              pathname: getGameRoute(lobbyInfo?.gameId),
+              query: {
+                gsid: userSession?.$id,
+                gid: userSession?.gameId,
+                rId: roomId,
+              },
+            },
+            "from room card",
+            lobbyInfo?.gameId,
+            lobbyInfo
+          );
 
           if (userSession) {
             router.push({

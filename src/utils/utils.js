@@ -72,6 +72,7 @@ export const playSound = (
 };
 
 export const getGameScoreFunctionId = (gameId) => {
+  console.log(gameId);
   switch (gameId) {
     case "64d145a0cc7e92844e81": //memory master
       return "64e0a02a6088b749fc1a";
@@ -83,13 +84,12 @@ export const getGameScoreFunctionId = (gameId) => {
 };
 
 export const getGameRoute = (gameId) => {
-  console.log("inside", gameId);
+  console.log(gameId, "from get game router");
   switch (gameId) {
     case "64d145a0cc7e92844e81": //memory master
-      console.log("mmmmmmmmmmmmmmmm");
-      return "/sharp-shooter";
-    case "6476533db5284c9d7f9d": //sharpshooter
       return "/memory-master";
+    case "6476533db5284c9d7f9d": //sharpshooter
+      return "/sharp-shooter";
     default:
       return null;
   }
