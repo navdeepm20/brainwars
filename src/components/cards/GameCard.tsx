@@ -38,7 +38,7 @@ function GameCard({ gameInfo, sx, ...props }: propTypes) {
             fontSize: "1.4rem",
           }}
         >
-          MAX LIFE'S
+          MAX LIFE&apos;S
         </Typography>
         <Typography
           align="center"
