@@ -22,7 +22,7 @@ import { useState } from "react";
 import { customToast, getModeId } from "@/utils/utils";
 import { getRandomAvatarUrl } from "@/utils/components/pickGame";
 
-function index({ games, ...props }) {
+function PickGame({ games, ...props }) {
   const router = useRouter();
   const params = router.query;
   const { dispatch } = useContext(globalContext);
@@ -179,7 +179,7 @@ function index({ games, ...props }) {
             sx={{ color: "customTheme.text2", mb: 4 }}
             align="center"
           >
-            Let's choose the path to your victory
+            Let&apos;s choose the path to your victory
           </Typography>
           {isSubmitting ? (
             <Loader disableMessage />
@@ -268,7 +268,7 @@ function index({ games, ...props }) {
   );
 }
 
-export default index;
+export default PickGame;
 
 export async function getStaticProps() {
   const response = await databases.listDocuments(

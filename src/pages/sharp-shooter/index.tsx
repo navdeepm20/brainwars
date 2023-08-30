@@ -41,7 +41,7 @@ interface routerType extends ParsedUrlQuery {
   rId: string | null | undefined;
 }
 
-function index({ ...props }) {
+function SharpShooter({ ...props }) {
   const router = useRouter();
   const {
     gsid: gameSessionId,
@@ -436,7 +436,7 @@ function index({ ...props }) {
                     sx={{ color: "customTheme.text2" }}
                     align="center"
                   >
-                    Let's Go
+                    Let&apos;s Go
                   </Typography>
                 </>
               ) : (
@@ -527,7 +527,7 @@ function index({ ...props }) {
                 ) : (
                   <>
                     <Typography mt={1} mb={2} align="center">
-                      All Life's Exhausted! 💔
+                      All Life&apos;s Exhausted! 💔
                     </Typography>
                     <Typography
                       sx={{ fontSize: "3rem", mb: "3rem" }}
@@ -573,4 +573,4 @@ function index({ ...props }) {
   );
 }
 
-export default index;
+export default SharpShooter;

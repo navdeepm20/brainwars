@@ -11,7 +11,7 @@ interface Props {
   [props: string]: any;
 }
 
-function index({ title, startTimer, timerRef, ...props }: Props) {
+function TimeElapsed({ title, startTimer, timerRef, ...props }: Props) {
   const [gameTimer, setGameTimer] = useState<number>(0);
 
   useEffect(() => {
@@ -42,4 +42,4 @@ function index({ title, startTimer, timerRef, ...props }: Props) {
   );
 }
 
-export default index;
+export default TimeElapsed;

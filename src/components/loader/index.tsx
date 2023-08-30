@@ -7,7 +7,7 @@ type loaderPropTypes = {
   disableMinHeight?: boolean;
   [props: string]: any;
 };
-function index({
+function Loader({
   message,
   disableMessage,
   disableMinHeight,
@@ -36,8 +36,8 @@ function index({
     </Paper>
   );
 }
-index.defaultProps = {
+Loader.defaultProps = {
   message: "Loading...",
 };
 
-export default index;
+export default Loader;

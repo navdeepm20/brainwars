@@ -31,7 +31,7 @@ import {
 //sounds
 // import notifcationSound from "@public/assets/audios/notification/mario_coin.mp3";
 
-function index({ games, ...props }) {
+function Index({ games, ...props }) {
   const { setGames, setMetaInfo } = useContext(globalContext);
   const [name, setName] = useState("");
   const router = useRouter();
@@ -80,9 +80,9 @@ function index({ games, ...props }) {
               alignItems: "center",
               p: "1rem 2rem",
               border: "1px solid #333",
-              // background: " rgba( 77, 72, 72, 0.25 )",
-              // boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
-              // backdropFilter: "blur( 4px )",
+              background: " rgba( 77, 72, 72, 0.25 )",
+              boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
+              backdropFilter: "blur( 4px )",
             }}
           >
             <Typography
@@ -98,7 +98,7 @@ function index({ games, ...props }) {
               sx={{ color: "customTheme.text2", mb: 4 }}
               align="center"
             >
-              Let's start the Fun
+              Let&apos;s start the Fun
             </Typography>
 
             <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter You Name</InputLabel>
@@ -123,7 +123,7 @@ function index({ games, ...props }) {
                 sx={{ color: "customTheme.text", mb: 4 }}
                 align="center"
               >
-                Let's have more fun with multiplayer battles
+                Let&apso;s have more fun with multiplayer battles
               </Typography>
               <Stack direction="row" spacing={3}>
                 <Button
@@ -167,7 +167,7 @@ function index({ games, ...props }) {
   );
 }
 
-export default index;
+export default Index;
 
 export async function getStaticProps() {
   const response = await databases.listDocuments(

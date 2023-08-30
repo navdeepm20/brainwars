@@ -11,7 +11,12 @@ interface PropsType {
   [props: string]: any;
 }
 
-function index({ musicPath, sx, defaultPlay = true, ...props }: PropsType) {
+function GameSoundPlayer({
+  musicPath,
+  sx,
+  defaultPlay = true,
+  ...props
+}: PropsType) {
   const [shouldPlayTheme, setShouldPlayTheme] = useState(defaultPlay);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const isMounted = useRef(false);
@@ -55,4 +60,4 @@ function index({ musicPath, sx, defaultPlay = true, ...props }: PropsType) {
   );
 }
 
-export default index;
+export default GameSoundPlayer;

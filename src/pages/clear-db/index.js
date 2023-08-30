@@ -15,7 +15,7 @@ import {
 //context
 import { globalContext } from "@/context/GlobalContext";
 
-function index({ games, ...props }) {
+function ClearDb({ games, ...props }) {
   const { setGames } = useContext(globalContext);
   const [name, setName] = useState("");
 
@@ -111,7 +111,7 @@ function index({ games, ...props }) {
   );
 }
 
-export default index;
+export default ClearDb;
 
 export async function getStaticProps() {
   const response = await databases.listDocuments(

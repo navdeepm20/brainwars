@@ -4,7 +4,7 @@ interface propTypes {
   color?: string;
   [props: string]: any;
 }
-function index({ color, ...props }) {
+function StatusIndicator({ color, ...props }) {
   return (
     <Box
       sx={{
@@ -17,4 +17,4 @@ function index({ color, ...props }) {
   );
 }
 
-export default index;
+export default StatusIndicator;

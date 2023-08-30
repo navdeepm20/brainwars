@@ -11,7 +11,7 @@ interface timerProps {
   text?: string;
   [props: string]: any;
 }
-function index({ maxCountDown, text, ...props }: timerProps) {
+function CountDownTimer({ maxCountDown, text, ...props }: timerProps) {
   const [displayText, setDisplayText] = useState(text[0] || "");
   const [time, setTime] = useState(maxCountDown);
   const countIndex = useRef<number | null>(1);
@@ -68,9 +68,9 @@ function index({ maxCountDown, text, ...props }: timerProps) {
     </Box>
   );
 }
-index.defaultProps = {
+CountDownTimer.defaultProps = {
   text: ["Get Ready", "Relax your mind", "Keep Focused"],
   maxCountDown: 3,
 };
 
-export default index;
+export default CountDownTimer;

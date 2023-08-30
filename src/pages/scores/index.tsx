@@ -44,7 +44,7 @@ interface propTypes extends ParsedUrlQuery {
   rid: string;
   gsid: string;
 }
-function index({ ...props }) {
+function Scores({ ...props }) {
   const router = useRouter();
 
   const { rid: roomId, gsid: gameSessionId } = router.query as propTypes;
@@ -318,4 +318,4 @@ function index({ ...props }) {
   );
 }
 
-export default index;
+export default Scores;

@@ -5,7 +5,7 @@ import { loadFull } from "tsparticles";
 //internal config
 import { particlesConfig } from "./particlesConfig2";
 
-function index({ ...props }: { [props: string]: any }) {
+function ParticlesBg({ ...props }: { [props: string]: any }) {
   const particlesInit = useCallback(async (engine) => {
     // console.log(engine);
     // you can initiate the tsParticles instance (engine) here, adding custom shapes or presets
@@ -27,4 +27,4 @@ function index({ ...props }: { [props: string]: any }) {
   );
 }
 
-export default index;
+export default ParticlesBg;
