@@ -85,7 +85,7 @@ function ClearDb({ games, ...props }) {
           sx={{ color: "customTheme.text2", mb: 4 }}
           align="center"
         >
-          Let's start the Fun
+          Let&apos;s start the Fun
         </Typography>
 
         <InputLabel sx={{ mr: "auto", mb: 1 }}>Enter Collection Id</InputLabel>

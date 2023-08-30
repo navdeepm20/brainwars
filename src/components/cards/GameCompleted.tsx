@@ -40,7 +40,7 @@ function GameCompleted({
   return (
     <Box sx={{ ...sx }}>
       <Typography mt={1} mb={2} align="center">
-        Congratulation's 🎉
+        Congratulations 🎉
       </Typography>
       <Typography sx={{ fontSize: "3rem", mb: "3rem" }}>
         GAME COMPLETED

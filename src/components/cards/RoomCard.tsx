@@ -351,7 +351,7 @@ const GameRoomCard = ({ ...props }) => {
               }}
               align="center"
             >
-              Welcome to {creatorInfo?.name}'s Room
+              Welcome to {creatorInfo?.name}&apos;s Room
             </Typography>
             <Stack
               direction="row"

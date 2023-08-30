@@ -141,7 +141,7 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
             sx={{ color: "customTheme.text" }}
             align="center"
           >
-            Let's Have Fun With Friends
+            Let&apos;s Have Fun With Friends
           </Typography>
           <Typography
             variant="subtitle1"
@@ -235,7 +235,7 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
 
         <Stack className="join-create" sx={{ mt: 8 }} alignItems="center">
           <Typography sx={{ color: "customTheme.text", mb: 4 }} align="center">
-            Don't want to create? Join a room
+            Don&apos;t want to create? Join a room
           </Typography>
           <Stack direction="row" spacing={3}>
             <LoadingBtn
