@@ -19,6 +19,7 @@ import {
   getUniqueId,
   Query,
 } from "@/utils/appwrite/appwriteConfig";
+import { Models } from "appwrite";
 //react
 import { useContext, useEffect, useState } from "react";
 //internal
@@ -35,11 +36,18 @@ import { useRouter } from "next/router";
 import { customToast, getGameRoute } from "@/utils/utils";
 
 //types
-type gameInfo = {
+type gameDatatype = Models.Document & {
   $id: string;
-  name: string;
+  gameName: string;
+  gameType: string;
+  maxLifes: number;
+  $createdAt: string;
+  $updatedAt: string;
+  $permissions: string[];
+  $collectionId: string;
+  $databaseId: string;
 };
-type roomData = {
+type roomDatatype = Models.Document & {
   $id: string;
   roomName: string;
   gameSessions: string[];
@@ -49,12 +57,23 @@ type roomData = {
   status: string;
   players: string[];
   creatorId: string;
+  $createdAt: string;
+  $updatedAt: string;
+  $permissions: string[];
+  $collectionId: string;
+  $databaseId: string;
 };
-type creatorInfo = {
+
+type creatorDatatype = Models.Document & {
   $id: string;
   name: string;
   creatorId: string;
   avatarUrl: string;
+  $createdAt: string;
+  $updatedAt: string;
+  $permissions: string[];
+  $collectionId: string;
+  $databaseId: string;
 };
 
 const GameRoomCard = ({ ...props }) => {
@@ -64,9 +83,9 @@ const GameRoomCard = ({ ...props }) => {
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const { user, setUser } = useContext(globalContext);
   const [playersInfo, setPlayersInfo] = useState(null);
-  const [roomData, setRoomData] = useState<roomData | null>(null);
-  const [gameInfo, setGameInfo] = useState<gameInfo | null>(null);
-  const [creatorInfo, setCreatorInfo] = useState<creatorInfo | null>();
+  const [roomData, setRoomData] = useState<roomDatatype | null>(null);
+  const [gameInfo, setGameInfo] = useState<gameDatatype | null>(null);
+  const [creatorInfo, setCreatorInfo] = useState<creatorDatatype | null>();
   const [isGettingData, setIsGettingData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [startTimer, setStartTimer] = useState(false);
@@ -81,7 +100,7 @@ const GameRoomCard = ({ ...props }) => {
         const response = await databases?.getDocument(
           dbIdMappings?.main,
           collectionsMapping?.rooms,
-          lobbyId
+          lobbyId as string
         );
         setLobbyInfo(response);
       })();
@@ -176,7 +195,7 @@ const GameRoomCard = ({ ...props }) => {
                 dbIdMappings?.main,
                 collectionsMapping?.game_session,
                 session,
-                [Query.search("gameSessions", [session])]
+                [Query.search("gameSessions", session)]
               );
             }
           );
@@ -184,19 +203,6 @@ const GameRoomCard = ({ ...props }) => {
           const gameSessionsData = await Promise.all(gameSessionPromises);
           const userSession = gameSessionsData.find(
             (session) => session?.creatorId === user?.id
-          );
-          console.log(
-            {
-              pathname: getGameRoute(lobbyInfo?.gameId),
-              query: {
-                gsid: userSession?.$id,
-                gid: userSession?.gameId,
-                rId: roomId,
-              },
-            },
-            "from room card",
-            lobbyInfo?.gameId,
-            lobbyInfo
           );
 
           if (userSession) {
@@ -240,12 +246,13 @@ const GameRoomCard = ({ ...props }) => {
           customToast("Oops..Game already started.", "warning");
           setIsGameAlreadyStarted(true);
         }
-        setRoomData(roomInfo);
+        console.log(roomInfo, gameInfo);
+        setRoomData(roomInfo as roomDatatype);
         setRoomId(roomInfo?.$id);
 
         //get the game info
 
-        setGameInfo(gameInfo);
+        setGameInfo(gameInfo as gameDatatype);
 
         //get the creator info
         const creatorInfo = await databases.getDocument(
@@ -253,7 +260,7 @@ const GameRoomCard = ({ ...props }) => {
           collectionsMapping?.gamers,
           roomInfo.creatorId
         );
-        setCreatorInfo(creatorInfo);
+        setCreatorInfo(creatorInfo as creatorDatatype);
       } catch (err) {
         customToast(err?.message, "error");
       } finally {
@@ -315,7 +322,7 @@ const GameRoomCard = ({ ...props }) => {
     if (roomData?.$id)
       client.subscribe(
         `databases.${dbIdMappings.main}.collections.${collectionsMapping?.rooms}.documents.${roomData?.$id}`,
-        (response: { payload: roomData }) => {
+        (response: { payload: roomDatatype }) => {
           setRoomData(response?.payload);
         }
       );
