@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Confetti from "react-confetti";
 
 const ConfettiAnimation = () => {
-  const [window, setWindow] = useState();
+  const [window, setWindow] = useState<Window | null>();
+  const isMounted = useRef(false);
   useEffect(() => {
     setWindow(window);
+    isMounted.current = true;
   }, []);
   return (
     <Confetti

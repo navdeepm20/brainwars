@@ -34,12 +34,10 @@ function JoinRoom({ goBackHandler, ...props }) {
   const [name, setName] = useState("");
   const [roomCode, setRoomCode] = useState("");
   const [isJoiningRoom, setIsJoiningRoom] = useState(false);
-  // const [roomInfo, setRoomInfo] = useState(null);
   const router = useRouter();
   const handleJoinRoom = async (e) => {
     try {
       setIsJoiningRoom(true);
-
       //find room
       const response = await databases.listDocuments(
         dbIdMappings?.main,
@@ -183,7 +181,7 @@ function JoinRoom({ goBackHandler, ...props }) {
           fullWidth
           color="success"
           onClick={handleJoinRoom}
-          disabled={name?.trim("").length <= 4 || roomCode?.trim("").length < 6}
+          disabled={name?.trim().length <= 4 || roomCode?.trim().length < 6}
           isLoading={isJoiningRoom}
         >
           Join Room

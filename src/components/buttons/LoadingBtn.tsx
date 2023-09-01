@@ -3,7 +3,7 @@ import { Button, CircularProgress } from "@mui/material";
 
 interface propTypes {
   isLoading?: boolean;
-  onClick?: () => void;
+  onClick?: (e?) => void;
   children: string;
   circularProgressProps?: any;
   [props: string]: any;
