@@ -1,6 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
-// import CardBack from "@public/assets/images/card-back.jpg";
+//next
+import Image from "next/image";
 const Card = ({ cardId, image, flipped, disable, onClick, cardIndex }) => {
   return (
     <Box
@@ -23,16 +24,22 @@ const Card = ({ cardId, image, flipped, disable, onClick, cardIndex }) => {
         })}
       >
         {flipped ? (
-          <img src={image} alt="card image" style={{ maxWidth: "90%" }} />
+          <Image
+            src={image}
+            alt="card image"
+            style={{ maxWidth: "90%" }}
+            priority={true}
+          />
         ) : (
-          <img
+          <Image
             src="/assets/images/card-back.jpg"
             alt="Card Back"
+            width={100}
             style={{
-              width: "100px",
               transform: flipped ? "rotateY(180deg)" : "",
               transition: ".7s transform ease",
             }}
+            priority={true}
           />
         )}
       </Box>
