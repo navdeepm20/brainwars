@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
 //internal config
-import { particlesConfig } from "./particlesConfig2";
+import { particlesConfig } from "./staryConfig";
 
 function ParticlesBg({ ...props }: { [props: string]: any }) {
   const particlesInit = useCallback(async (engine) => {

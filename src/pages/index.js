@@ -123,7 +123,7 @@ function Index({ games, ...props }) {
                 sx={{ color: "customTheme.text", mb: 4 }}
                 align="center"
               >
-                Let&apso;s have more fun with multiplayer battles
+                Let&apos;s have more fun with multiplayer battles
               </Typography>
               <Stack direction="row" spacing={3}>
                 <Button
