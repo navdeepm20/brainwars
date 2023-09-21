@@ -5,6 +5,7 @@ import Image from "next/image";
 import CardBackImg from "@public/assets/images/card-back.webp";
 
 const Card = ({ cardId, image, flipped, disable, onClick, cardIndex }) => {
+  console.log(image, CardBackImg);
   return (
     <Box
       onClick={(e) => {
@@ -26,12 +27,12 @@ const Card = ({ cardId, image, flipped, disable, onClick, cardIndex }) => {
           position: "relative",
         })}
       >
-        <Image
-          src={flipped ? image : CardBackImg}
+        <img
+          src={image}
           alt="card image"
-          fill={true}
-          quality={1}
           style={{
+            width: "100%",
+            height: "100%",
             objectFit: "cover",
           }}
         />
