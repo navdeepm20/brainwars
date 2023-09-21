@@ -31,6 +31,7 @@ const Card = ({ cardId, image, flipped, disable, onClick, cardIndex }) => {
           alt="card image"
           priority={true}
           fill={true}
+          quality={1}
           style={{
             objectFit: "cover",
           }}

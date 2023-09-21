@@ -238,13 +238,13 @@ function Scores({ ...props }) {
       {isScoreCalculated && <ConfettiAnimation />}
       <Card
         sx={{
-          border: "1px solid #333",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
           borderRadius: "8px",
           minWidth: "35rem",
           width: "100%",
           maxWidth: "60rem",
-          background: " rgba( 77, 72, 72, 0.25 )",
-          boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
+          background: "rgba(255, 255, 255, 0.02)",
+          boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
           backdropFilter: "blur( 4px )",
         }}
       >
