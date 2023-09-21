@@ -28,7 +28,7 @@ const Card = ({ cardId, image, flipped, disable, onClick, cardIndex }) => {
         })}
       >
         <img
-          src={image}
+          src={flipped ? image : CardBackImg?.src}
           alt="card image"
           style={{
             width: "100%",
