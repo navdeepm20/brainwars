@@ -29,7 +29,6 @@ const Card = ({ cardId, image, flipped, disable, onClick, cardIndex }) => {
         <Image
           src={flipped ? image : CardBackImg}
           alt="card image"
-          priority={true}
           fill={true}
           quality={1}
           style={{
