@@ -30,12 +30,12 @@ import GameCompleted from "@/components/cards/GameCompleted";
 //TOTAL PAIRS
 const TOTAL_CARD_PAIRS = 6;
 const images = [
-  "/assets/images/1.jpg",
-  "/assets/images/2.jpg",
-  "/assets/images/3.jpg",
-  "/assets/images/4.jpg",
-  "/assets/images/5.jpg",
-  "/assets/images/6.jpg",
+  "/assets/images/1.webp",
+  "/assets/images/2.webp",
+  "/assets/images/3.webp",
+  "/assets/images/4.webp",
+  "/assets/images/5.webp",
+  "/assets/images/6.webp",
   "/assets/images/7.png",
 ]; // Add more images as needed
 
@@ -137,7 +137,7 @@ const MemoryGame = () => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setShowTimer(false);
-    }, 4000);
+    }, 5000);
     const countdownAudio = new Audio("/assets/audios/countdown/countdown.mp3");
     countdownAudio.play();
     return () => {

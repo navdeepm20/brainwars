@@ -2,7 +2,7 @@ import React from "react";
 import { Box } from "@mui/material";
 //next
 import Image from "next/image";
-import CardBackImg from "@public/assets/images/card-back.jpg";
+import CardBackImg from "@public/assets/images/card-back.webp";
 
 const Card = ({ cardId, image, flipped, disable, onClick, cardIndex }) => {
   return (
