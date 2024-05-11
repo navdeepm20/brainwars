@@ -76,7 +76,7 @@ function CreateRoom({ joinRoomHandler, goBackHandler, ...props }) {
             roomName,
             gameId: gameId,
             creatorId: response?.$id,
-            maxParticipants: participants,
+            maxParticipants: Number(participants),
             roomCode: generateRoomCode(),
           }
         );
