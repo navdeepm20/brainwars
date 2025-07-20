@@ -113,6 +113,7 @@ const PlayerCard = ({
           </span>
         )}
       </Stack>
+
       {score !== null && score !== undefined && (
         <Stack direction="row" sx={{ ml: "auto" }}>
           <Typography component="span">

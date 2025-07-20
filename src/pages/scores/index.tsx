@@ -60,6 +60,7 @@ function Scores({ ...props }) {
     audio.play();
   };
 
+  console.log(finalScores);
   useEffect(() => {
     //update the session status to completed
     if (gameSessionId) {
@@ -126,9 +127,7 @@ function Scores({ ...props }) {
       })();
     } else if (getModeId() === gameModeId?.single && !roomId && gameSessionId) {
       (async () => {
-        const scoresInfo = await getScore(gameSessionId);
         const gameSessionInfo = await getGameSession(gameSessionId);
-
         const gameInfo = await fetchGameInfo(gameSessionInfo?.gameId);
         setGameInfo(gameInfo);
         const playerInfo = await getPlayerInfo(gameSessionInfo?.creatorId);
@@ -144,13 +143,23 @@ function Scores({ ...props }) {
             })
           )
           .then((response) => {
-            const parsedData = JSON.parse(response?.response);
-
-            setFinalScores(parsedData?.scoreInfo); // Handle the function execution response
-            setIsGettingData(false);
-            setIsScoreCalculated(true);
-            customToast("Scores Calculated", "success");
-            playVictorySound();
+            const parsedData = JSON.parse(response?.response)?.scoreInfo ?? {};
+            const scores = [];
+            if (parsedData) {
+              for (let score in parsedData) {
+                scores.push(parsedData[score]);
+              }
+              setFinalScores(scores); // Handle the function execution response
+              setIsGettingData(false);
+              setIsScoreCalculated(true);
+              customToast("Scores Calculated", "success");
+              playVictorySound();
+            }
+            // else
+            //   customToast(
+            //     "Something went wrong in getting your scores!",
+            //     "error"
+            //   );
           })
           .catch((error) => {
             customToast(error?.message, "error");
@@ -158,7 +167,7 @@ function Scores({ ...props }) {
           });
       })();
     } else {
-      // customToast("Something went wrong. Please reload or try again.", "error");
+      customToast("Something went wrong. Please reload or try again.", "error");
     }
   }, [router]);
 
@@ -199,7 +208,7 @@ function Scores({ ...props }) {
           const allLinkedPlayersScores = await fetchScoresInfo(
             allLinkedGameSessions
           );
-          console.log(gameSessionsInfo);
+
           functions
             .createExecution(
               getGameScoreFunctionId(gameSessionsInfo[0]?.data?.gameId),
@@ -213,13 +222,25 @@ function Scores({ ...props }) {
               })
             )
             .then((response) => {
-              const parsedData = JSON.parse(response?.response);
-
-              setFinalScores(parsedData?.scoreInfo); // Handle the function execution response
-              setIsGettingData(false);
-              setIsScoreCalculated(true);
-              playVictorySound();
-              customToast("Scores Calculated", "success");
+              response;
+              const parsedData =
+                JSON.parse(response?.response)?.scoreInfo ?? {};
+              const scores = [];
+              if (parsedData) {
+                for (let score in parsedData) {
+                  scores.push(parsedData[score]);
+                }
+                setFinalScores(scores);
+                setIsGettingData(false);
+                setIsScoreCalculated(true);
+                playVictorySound();
+                customToast("Scores Calculated", "success");
+              }
+              // else
+              // customToast(
+              //   "Something went wrong in getting your scores!",
+              //   "error"
+              // );
             })
             .catch((error) => {
               customToast(error?.message, "error");
@@ -271,6 +292,7 @@ function Scores({ ...props }) {
             <Stack rowGap={2} mt={4}>
               {!finalScores?.length
                 ? gameSessionsInfo?.map((session, index) => {
+                    console.log(session?.data?.score, "from score");
                     return (
                       <PlayerCard
                         avatarUrl={session?.avatarUrl}

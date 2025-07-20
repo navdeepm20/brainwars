@@ -1,6 +1,5 @@
 //mui
 import {
-  Box,
   Card,
   CardContent,
   Stack,
@@ -194,8 +193,7 @@ const GameRoomCard = ({ ...props }) => {
               return await databases?.getDocument(
                 dbIdMappings?.main,
                 collectionsMapping?.game_session,
-                session,
-                [Query.search("gameSessions", session)]
+                session
               );
             }
           );
